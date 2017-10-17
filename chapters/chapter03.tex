@@ -1,6 +1,9 @@
 \chapter{基于深度学习的天波超视距雷达地海杂波识别}
 \section{Introduction}
 %
+天波超视距雷达利用电磁波在电离层与地/海面之间的反射作用传输高频能量，其作用距离不受地球曲率的限制，可实现对隐身战斗机、洲际导弹、巡航导弹、大中型舰船等高价值目标的远程预警，受到世界各国的高度关注。天波超视距雷达系统主要由主雷达和电离层探测子系统组成，其中后者为前者提供电离层传播条件评估以及坐标配准参数等。由于电离层探测子系统独立于主雷达工作，因此其提供的坐标配准参数与主雷达量测回波存在不一致性、误差大等问题，从而造成电离层传播模式识别正确率低、目标定位精度差等。一种改进方式是通过设置有源信标提供坐标配准修正参数，但是受到可部署区域的限制。由于陆地、海洋对雷达信号散射特性不同，可将陆地、海洋地理信息作为一类无源信标。通过区分识别地海杂波、构建地海边界轮廓、与先验地理轮廓信息匹配可同样提供坐标配准修正参数。传统地海杂波识别算法难以准确提取及表达地海杂波特征，从而在复杂电离层状况下地海杂波识别正确率较低。因此，如何发展一种更加准确的地海杂波类型识别方法，对天波超视距雷达电离层参数辨识及目标定位精度的提升有着重要意义。
+
+本发明解决在复杂的电离层环境下天波超视距雷达地海杂波类型的识别问题。本发明构建了适用于天波超视距雷达地海杂波类型识别的卷积神经网络，利用大量训练数据对卷积神经网络进行训练，提取合理的特征；然后，利用提取的特征对实时雷达地海杂波回波进行在线分类识别。本发明要解决的技术问题是提供一种新的基于深度神经网络的地海杂波识别技术，避免了手工提取地海杂波特征。本发明大大提高了天波超视距雷达地海杂波的识别正确率与实时性。
 
 Therefore, some authors present a method using passive islands as benchmark to find the PD transform coefficient\cite{cuccoli2011coordinate}. We can search for the location of the islands in measurement coordinates by identifying sea/land according to spectrum data and then correspond them with islands in the radar coordinates. Thus, we can get PD transforming coefficient according to the deviation of the same location benchmark. Therefore, the most basic and most critical part of this method is identifying sea/land clutter.
 
@@ -30,6 +33,24 @@ We note that the overall purpose of our work is to assess the feasibility of a c
 
 
 \subsection{Our Methodology}
+
+深度学习体系结构中有几大网络模型，其中的卷积神经网络可以直接将整个需要分类的数据作为网络的输入，避免了传统识别算法中复杂的特征提取和数据重建过程。基于此优点，使卷积神经网络在本发明所需解决的天波超视距雷达地海杂波特征识别问题中有着巨大优势。
+典型的卷积神经网络由深层结构堆叠在一起的多个不同的层组成：输入层，多组卷积和池化层，有限数量的完全连接的隐藏层，以及输出层。其中最主要的部分为卷积层。其利用输入数据中的局部结构，将整个输入空间划分成很小的隐藏单元。将各个隐藏单元的权重构建得到的卷积核作用于整个输入空间，从而得到特征向量。利用这种机制，我们不仅大大减少了参数数量同时提高了数据的平移不变性。
+本专利根据地海杂波频谱的实际数据以及其反映出来的特性，构建了基本的具有3 层隐藏层的深度卷积神经网络，每层具有多个特征向量，每个特征向量具有多个神经元，并且每个特征向量来自于一种卷积核所提取输入的一种特征。
+步骤1 : 输入地海杂波频谱序列，设其为1*N的序列，对其进行卷积运算，得到第一个卷积层，用C1表示。本专利使用32个大小为1*3的卷积核，故特征向量中每个神经元与输入中的1*3的邻域相连，这样C1层中的特征大小就为1*（N-3）。又因为C1有128个可训练参数(每个滤波器具有3个单元参数和一个偏置参数，一共32个滤波器，共(1*3+1) *32 =128个参数)，共128*（N-3）个连接，将连接通过ReLU激活层。
+步骤2 : 对C1进行最大池化处理，该操作将相邻的多个特征采用一个特征进行代替。通过降低特征向量的长度，在减小了计算量的同时也在一定程度上修正了过拟合情形。
+步骤3 : 将经过上述两个步骤获得的特征向量作为新的输入，重复多次步骤1至2（本专利为三次），可以得到一个三阶段的卷积神经网络结构。上述多阶段卷积操作充分提取了输入向量的特征。
+步骤4：构建输出层。拉平（flatten）步骤3获得的特征向量，以此作为卷积层到全连接层的一个过渡。在第一个全连接层的基础上添加dropout参数，然后添加第二层全连接，通过激活函数Sigmoid，获得分类结果的输出层。
+步骤5：训练神经网络模型。在搭建好神经网络模型后，利用训练样本对该模型做进一步训练，其基本步骤如下：
+步骤a、 初始化步长 ，矩估计的期望衰变率 ，初始参数 ，一阶矩与二阶矩变量 ，迭代次数 。
+步骤b、从训练集中获取对应于目标 的具有 个样本的采样 ，其中 为批处理中一批样本的个数。
+步骤c、计算梯度  ，其中 为对数损失函数，其定义为 。
+步骤d、更新迭代次数 ，有偏一阶矩估计 ，有偏二阶矩估计 。
+步骤e、修正一阶矩估计 ，二阶矩估计 。
+步骤f、更新参数  ，其中 用来保持稳定性，同时判断是否满足结束条件，如果不满足重复步骤b-f。
+步骤6：在线识别。将需要识别的样本进行融合预处理，其基本思路为维护一个滑窗，对于某滑窗内的对应分辨单元的数据进行加权融合，其权值与窗长需要根据实验数据进行确定（本专利窗长选择为5），然后将融合后的数据通过步骤5获得的训练好的模型，得到最终识别结果。
+
+
 Convolution neural network(CNN) is an important algorithm in deep learning and has great superiority in classification and other fields. This method is frequently used to deal with picture recognition, speech recognition and other issues. It does convolution operation for the original data and then extracts the feature of convolution data generated from the last step, which enriches the features used in the recognition greatly. At the same time, it can reduce the computational complexity due to merging some of the adjacent features. By applying CNN to sea/land clutter identification, we avoid the modeling of sea/land clutter, which fundamentally avoids the difficulties faced by traditional methods. We build a three-layer convolution neural network combining our specific problems. On this basis, we use the same sample to train and test SVM method and our algorithm separately. The experiments results demonstrate the stability and accuracy of our algorithm in the actual situation. Our sea/land clutter identification problem is based primarily on the characteristics of the spectral data to identify. The artificial identification depends mainly on the existence of a Bragg peak in sea clutter or only one peak near zero frequency in land clutter. However, there are still some remaining features, that cannot be found very clearly artificially, such as the overall amplitude and so on. Besides, there are still some useless features in some spectrum data, for example, a target appears, which can be easily excluded through the volume and feature extraction and weight sharing. Thus, a method based on CNN fits our problem strongly.
 
 In summary, our novelty here is twofold:
@@ -93,6 +114,8 @@ y_{i, j}= \left\{\begin{array}{ll}
 0 represents the sea and 1 represents the land.
 \subsection{Our Classification Algorithm}
 A typical convolution neural network consists of a number of different layers stacked together by a deep structure: an input layer, multiple sets of convolution and pooling layers, a finite number of fully connected hidden layers, and an output layer.
+
+受电离层非平稳、时变等特性影响，天波超视距雷达杂波数据可能会出现较大波动。对这种波动不加处理会导致地海杂波识别结果不准确。在一个相对短时间内，电离层会保持一个较平稳的状态，也即同一距离、方位单元的地海属性不会发生变化。本专利采用滑窗融合的方法对输入数据进行预处理。其基本思想是，将连续窗长时间内的相邻杂波数据进行加权融合得到新的频谱数据作为输入。
 
 The convolution layer introduces a special way of organizing a hidden element whose purpose is to take advantage of the local structure that exists in the input data. Each hidden unit is not connected to all inputs from the upper layer and is limited to only a small portion of the entire input space (for example, a small $1*3$ block). The weight of this hidden unit creates a convolution kernel, which is applied to the entire input space, resulting in feature maps. In this approach, you can reuse a set of weights for the entire input space. This is based on the premise that local useful features are also useful in other locations in the input space, which not only greatly reduces the number of parameters to be estimated, but also improves the translation invariance of the data.
 
