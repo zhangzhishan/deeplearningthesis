@@ -1,56 +1,82 @@
 \chapter{绪论}
-\section{引言}
-而是
+\section{研究背景及意义}
+\textcolor{red}{正文大概65页，在参考文献前，目前45页}
+
+\textcolor{red}{问题用红色标出，重复用蓝色标出}
+
+% TODO: 辐射源部分内容仍然较少。
+% TODO: 学习tikz的使用
+% NOTE: 正文大概65页，在参考文献前，目前52页。
+% 第一章 7 页 （第一部分可以先完成，天波部分等英文文章的绪论）
+% 第二章 10 页
+% 第三章 22 页
+% 第四章 12 页
+% 第五章 2 页（done）
+% NOTE: 问题用红色标出，重复用蓝色标出
+
+\textcolor{red}{二十世纪中后期以来,随着相关科学技术的迅速发展,人类进行信息获取和处理的广度和深度都有了巨大的扩展和延伸。雷达、红外成像、紫外探测、微光夜视、电视摄像及声探测等各种主、被动传感装置己覆盖了宽广的电磁波段,为全天候、大范围的获取信息提供了前提条件。同时,通信、计算机及数字信息处理技术的发展,实现了信息处理和传递的数字化,为及时有效的传递、交换和处理信息打下了基础。
+在现代信息获取和处理技术中,自动目标识别(Automatic Target Recognition， ATR)是一个十分重要的应用方面。ATR是指利用各种传感器,从客观世界中获取目标和背景信息,并利用计算机信息处理手段自动分析场景,检测和识别感兴趣的目标及获取目标各种定性、定量性质的科学技术。从信息处理的角度,ATR大致可以分为以下几个层次
+1.检测:发现感兴趣的待识别目标,但还没有确认;
+2.识别和确认:辨识目标所属类别,确定目标为所属类别中的哪一类型;
+4.理解:进行目标行为意图及场景语义的解释等。
+以上几个层次描述了从低层到高层的信息处理过程,低层处理是高层处理的基础从应用的角度，ATR通常需要考虑存在关联性的三个方面
+1.观测对象;
+2.传感器子系统;
+3.信息处理子系统。
+以上三个方面相互影响、相互制约,传感器系统决定了可以对哪些对象进行观测,信息处理系统的处理过程又要以传感器系统和观测对象为前提条件。在选择传感器时,应充分考虑相关的性能要求以及系统的环境条件。成像传感器是最常见的传感器,可提供丰富且直观的图像信息,常见的成像传感器及其特点如表1.1所不。}
+
+可以把分类问题抽象成一个机器学习的问题，根据给定的训练数据集学习出一个函数，当新数据到来时，可以根据这个函数预测出结果。具体的机器学习的算法很多，通过回归分析和统计分类来构造条件概率，如人工神经网络，各种决策树等等。每个算法，当训练集满足一定的条件，预测的误差都是可以量化的控制在某一个范围的。
+
+随着信息技术的飞速发展以及这些技术在军事上的广泛应用，信息技术已经普遍渗透到各种武器装备中，现代战争在很大程度上是信息战。信息战的一个重要特征是利用各种探测、感知手段，借助计算机网络、通信技术，对敌人的作战不对情况做到精确的探测评估，做到“知己知彼，百战不殆”。在信息化战争中，对于空间信息探测、敌方势力的识别、跟踪、定位等功能，主要依靠电子技术来完成\cite{顾耀平2006电子战发展趋势分析, 孙德海2003国外电子战发展综述及对我国电子战研究的思考, 炜森1996综合电子战新技术新方法, 孙纪尧2014电子战}。
+
+远程预警是信息战的一个重要部分，需要完成对地平线一下的大型舰船、飞机、导弹等远距离空中或者海中的高价值运动目标的探测，提供远程监视及对关注的空域或者海域目标的检测与跟踪。由于天波超视距雷达（Over-the-Horizon-Radar, OTHR）利用电磁波在电离层间的反射传输高频能量，具有反隐身、抗干扰等有点，其预警能力远远超出常规体制雷达，目前受到越来越多的国家的关注。
+
+信息战的另一个部分是电子情报侦察系统，其主要用途是获取雷达信号的参数情报和战场情报。信号处理的目的就是要详细地了解信号环境中所有雷达信号的特征参数，从中进一步判断这些雷达的用途、平台类别，进而判断其武器系统以及威胁等级，为战略情报分析提供信息。
+
+\textcolor{red}{本文围绕xxxx。本文对实际数据进行分析，利用深度学习的思想及方法，对天波超视距雷达地海杂波识别以及辐射源的识别进行研究分析，对后续的雷达信号的处理具有一定的理论指导价值和工程借鉴意义。}
 \section{天波超视距雷达地海杂波识别}
+\textcolor{red}{这一部分可以稍晚再修改，根据文章内容进行修改}
 
-超视距雷达（OTHR）在高频段运行，能够通过电离层反射检测和定位超过地平线的地区的移动目标，因此在持续监测中起着重要作用\cite{headrick1974over, fabrizio2013high}。 然而，电磁信号通过电离层的传播导致强制性程序，用于目标定位的坐标登记〜（CR），因为地面坐标系中的目标位置（即纬度和经度）是必需的，但是OTHR接收测量 倾斜坐标系〜（即倾斜方位角和倾斜范围）\cite{krolik1997maximum}。 要执行CR，必须调用两个子步骤，（1）为每个测量或目标状态估计选择正确的电离层传播模式，（2）将测量或目标的状态估计从倾斜坐标系转换为地面坐标系。
+天波超视距雷达主要工作频率为6-28GHz，其能够通过电离层反射检测和定位地平线以外的移动目标，因此在持续监测中起着重要作用\cite{headrick1974over, fabrizio2013high}然而，电磁信号通过电离层的传播会发生坐标转换，目标处于地面坐标系（即经度和纬度）而天波雷达接收的量测信号则为雷达坐标系下（即斜距和方位角）\cite{krolik1997maximum}。这为雷达的目标跟踪提出了新的需求：坐标配准。在这个过程中，我们必须调用两个子过程：为每个测量或目标状态估计选择正确的电离层传播模式以及将测量或目标的状态估计从雷达坐标系转换为地面坐标系。
 
-% In general, a sub-system consists of several ionosondes is deployed and operated with OTHR to provide the information required by CR. The information includes the possible ionosphere propagation modes and the corresponding parameters for each propagation mode, such as the height of each layer of the ionosphere \cite{wheadon1994ionospheric}. OTHR takes such information from ionosondes as the input of it and achieves CR. There are two factors that may deteriorate the localization performance of OTHR using ionosondes. The first one is that the deployment of ionosondes is restricted to available areas. For example, ionosondes can not be deployed in the sea or hostile areas. The ionosphere's parameters of unavailable areas are often obtained by interpolation with those of available areas based on statistical ionospheric models, making the information input into CR inaccurate. The second one is that the independent operation of ionosondes from OTHR results in consistency on the number of propagation modes and inaccuracy on the parameters for each propagation mode. More specifically, the propagation modes recognized by ionosondes may not the same as the propagation modes that the measurements received by the OTHR originate from. Therefore, to reduce the chances of incorrect identification of propagation mode for each measurement or state estimate, and the effect caused by the error of parameters provided by ionosondes so that improve the accuracy of CR, alternative methodologies have to be sought.
-一般来说，由OTHR部署和操作的几个离子键合子的子系统提供CR所需的信息。该信息包括可能的电离层传播模式和每个传播模式的相应参数，例如电离层的每层的高度\cite{wheadon1994ionospheric}。 OTHR从Ionosondes获取这些信息作为其输入，并实现CR。有两个因素可能会降低使用离子键的OTHR的定位性能。第一个是离子质子的部署仅限于可用的区域。例如，离子潜能不能部署在海洋或敌对区域。不可用区域的电离层参数常常通过基于统计电离层模型的可用区域插值得到，使信息输入到CR不准确。第二个是来自OTHR的离子键的独立操作导致传播模式的数量和每个传播模式的参数的不准确性一致。更具体地说，离子键的识别传播模式可能不同于OTHR所接收的测量的传播模式。因此，为了减少每个测量或状态估计的传播模式的错误识别的机会，以及由离子质子提供的参数的误差引起的影响，从而提高CR的准确性，必须寻求替代方法。
+通常来说，天波雷达的坐标配准依赖其部署的电离层探测子系统，该系统可以提供可能的电离层传播模式以及每个模式对应的参数，利用电量层的每层高度\cite{wheadon1994ionospheric}。天波雷达利用这些电离层信息实现坐标配准。然而，利用该方法用两个因素会影响定位的性能：第一个是探测子系统的部署区域有限，例如该系统无法部署于远海或者敌对区域。对于这些不可用区域，传统的方法是利用基于统计的电离层模型的可用区域的结果进行插值求得，但电离层的建模十分复杂且不同区域可能具有较大的变化，这种方式会造成用于坐标配准的电离层参数误差较大，进而影响坐标配准和目标跟踪定位。第二个是电离层探测子系统独立于主雷达工作导致其提供的坐标配准参数与主雷达存在不一致性（电离层探测系统识别的传播模式可能不同于天波所接收的量测的传播模式）的问题。因此，为了提高电离层传播模式的识别正确率和电离层参数的准确度，进而提高坐标配准的准确性，我们急需一种替代方法。
 
-改善CR的一种方法是使用beacons\cite{weijers1995oth}。 OTHR接收信标发送的信号，并在倾斜坐标系中输出其位置上的测量值。 通过将测量与由GPS提供的地面坐标系中的信标的已知位置进行比较，可以实时地进行CR过程的校正。 然而，信标的使用仅限于可用的区域。 此外，需要对信标进行维护。
-% One way available to improve CR is using beacons \cite{weijers1995oth}. OTHR receives the signals transmitted by beacons and outputs the measurements on their locations in slant coordinate system. By comparing the measurements with known locations of beacons in ground coordinate system provided by GPS, correction on the CR process can be carry out in real-time. However, the utilization of beacons is restricted to available areas as well. Additionally, maintenance on beacons is needed.
+改善坐标配准的一种方法是使用信标\cite{weijers1995oth}。天波雷达接收信标发送的信号，并在雷达坐标系中输出其位置上的测量值。通过将测量与由GPS提供的地面坐标系中的信标的已知位置进行比较，可以实时地进行坐标的校正。然而，信标的使用仅限于可用的区域。此外，需要对信标进行维护。
 
-事实上，另一个来源，海洋/陆地的转变，可以被看作是一种被动的信标，因为海洋和陆地的信号是可以识别的，因为同样的原则是适用的。 使用海岸线的CR的想法首先出现在\cite{wheadon1994ionospheric, anderson1995auto}，没有详细的结果报告。 巴纳姆等人\cite{barnum1998over}提出了一种基于海/陆杂波识别的CR方法，主要依靠构造杂波模型。 然而，由于电离层状况的复杂性，海/陆杂乱的特征不稳定，例如海杂波，布拉格峰的主要特征之一可能会偏移甚至失去一个峰值。
-% In fact, another source, sea/land transitions, can be regarded as a kind of passive beacons since the same principle is applicable if the signals of sea and land are identifiable. The idea of using coastline for CR is first appeared in \cite{wheadon1994ionospheric, anderson1995auto}, where no detailed results were reported. Barnum~{\emph et. al.} \cite{barnum1998over} proposed a CR method based on sea/land clutter identification, which mainly relies on constructing the clutter model. However, due to the complexity of ionospheric situation, the characteristics of the sea/land clutter is not stable, for example, one of the main features of sea clutter, Brag peak, may shift or even lost one peak.
+事实上，我们可以利用远海区域的岛屿等陆地作为无源信标来求取电离层的相关参数。使用海岸线的坐标配准的想法首先出现在文\cite{wheadon1994ionospheric}中，然而该文并没有给出具体的思路以及实际数据的验证，只是提出了这种思路。巴纳姆等人\cite{barnum1998over}提出了一种基于地海杂波识别的坐标配准方法，主要依靠构造杂波模型。然而，由于电离层状况的复杂性，地海杂波杂乱的特征不稳定，例如海杂波的主要特征布拉格峰可能会偏移甚至失去一个峰值。
 
-在本文\cite{cuccoli2009over, cuccoli2009over2, cuccoli2010sea, cuccoli2011coordinate}中，我们提出了一种针对Horizon Sky Wave信号实时坐标注册问题的方法。 该方法是基于对雷达覆盖区域内的海陆过渡位移的先验知识，即利用监视区域的地理形态结构，利用其构建二进制掩模，将其用作 接收的雷达回波的地理参考。 概述了基于收到的雷达回波和二进制杂波签名之间的互相关最大化的地理参考算法，以便指出接收到的信噪比和差分海陆反射散射的最小要求 系数。
-% In \cite{cuccoli2009over, cuccoli2009over2, cuccoli2010sea, cuccoli2011coordinate}, In this paper, we propose an approach to the problem of real time coordinate registration for Over the Horizon Sky Wave signals. The approach is based on the a priori knowledge of the displacement of the sea-land transitions within the radar coverage area, namely, takes advantage of the geo-morphological structure of the surveillance area, employing it to build a binary mask to be used as a geographic reference for the received radar echo. The georeferencing algorithm, based on the maximization of the cross-correlation between the received radar echo and the binary clutter signatures, is outlined in order to point out the minimum requirements in terms of received signal-to-noise ratio and differential sea-land backscattering coefficient.
+Cuccoli\cite{cuccoli2009over, cuccoli2009over2, cuccoli2010sea, cuccoli2011coordinate}提出了一种针对天波超视距雷达信号实时坐标问题问题的方法。其方法是基于对雷达覆盖区域内的地海交界位移的先验知识，即利用监视区域的地理形态结构，利用其构建二进制掩模，将其用作接收的雷达回波的地理参考。概述了基于收到的雷达回波和二进制杂波签名之间的互相关最大化的地理参考算法，以便指出接收到的信噪比和差分海陆反射散射的最小要求系数。Cuccoli\cite{cuccoli2011coordinate}等人提出利用监控区域的地貌结构研究范围坐标配准问题。包括海岸线的地理信息由地海杂波的二进制识别结果表示，根据等电离层反射高度进一步转换为参考信号。通过最大化接收的雷达回波和表面掩模签名之间的互相关来确定正确的等效电离层反射高度。然而，他们假设天波雷达传输单脉冲信号，并提供数值模拟结果。
 
-在 \cite{cuccoli2009over2}中，我们最近提出了一种基于对海陆过渡位置的先验知识的天空天空雷达（OTHRsw）的接收到的回波的实时协调注册（CR）的相关方法 在雷达覆盖范围内。 在本文中，我们提出了一种软件仿真工具，用于分析不同OTHR情景中提出的CR方法的性能。 软件工具使用简化的电离层模型和表面杂波雷达相互作用的简化模型来模拟单声道OTH雷达传播。 提出并讨论了假设不同表面杂波场景的仿真结果。
-% In \cite{cuccoli2009over2}, We recently proposed a correlation method for the real time Coordinate Registration (CR) of the received echo by Over The Horizon Sky Wave Radar (OTHRsw) based on a priori knowledge of the positions of the Sea-Land transitions within the radar coverage area. In this paper we present a software simulation tool developed to analyze the performance of the proposed CR method in different OTHR scenarios. The software tool simulates the monostatic OTH radar propagation using simplified ionospheric models and simplified models of surface clutter radar interactions. Simulation results assuming different surface clutter scenarios are presented and discussed.
+Cacciamano\cite{cacciamano2012coordinate}等人提出了利用跟踪回波的斜距、多普勒和方位角来实现天波超视距雷达中的目标检测的方法。坐标配准是通过将斜距坐标转换为传输中使用的地面坐标来定位目标的过程。他们对传统的利用3D射线跟踪算法进行坐标配准的方法进行了改进。传统算法主要根据特定传输频率和仰角的地面距离距离，采用的射线跟踪方法获取高度，纬度和经度的3D电子密度模型变量。然而，射线跟踪输出通常受到三维电离层模型数值近似误差和用于积分光线跟踪算法的微分方程的离散化步骤影响。因此，原始坐标配准图受到误差的影响，导致目标定位精度的降低。因此，他们利用雷达进行地海转换来降低坐标配准误差。他们的方法基于对由雷达天线波束照射的区域内相对于海陆转变的实际组延迟的先验知识。他们的方法利用了监视区域的地貌结构，然后通过使用实际的组延迟饱和海陆转换来评估由3D射线跟踪软件引入的误差。之后，使用估计的误差来校正从射线跟踪输出直接获得的粗略坐标配准图。他们也在水平分层的电离层的简化假设下，验证了所提出的修正方法。
 
-在\cite{cuccoli2010sea}中，我们最近提出了一种基于对海上地位的先验知识的Over Horizon Horizon Wave Radar（OTHR-SW）的接收回波的实时协调注册（CR）的相关方法， 雷达覆盖区内的陆地过渡。 在本文中，我们提出了一个模拟器，可以用于现实OTHR场景中提出的CR方法的性能分析。 假设一个单一的海陆转换场景和一个地理上不变的垂直电子密度分布，提出和讨论了一些模拟结果。
-% In \cite{cuccoli2010sea}, We recently proposed a correlation method for the real time Coordinate Registration (CR) of the received echo by Over The Horizon Sky Wave Radar (OTHR-SW) based on a priori knowledge of the positions of the sea-land transitions within the radar coverage area. In this paper we present a simulator that can be used for performance analysis of the proposed CR method in realistic OTHR scenarios. Some simulation result are presented and discussed assuming a single sea-land transition scenario and a geographically invariant vertical electron density profile.
+天波超视距雷达可以通过反射来自电离层的高频（HF）信号来检测和跟踪1000到3000公里范围内的飞机或地面目标。坐标配准是将天波雷达目标从雷达坐标系转换到地理坐标系的过程。坐标配准通常通过实时电离层模型（real-time ionospheric model)进行射线跟踪。从已知参考点（known reference points）产生可识别的雷达回报的机会散射体也可能被用于坐标配准。为了补充传统的被动参考源，Fabrizio\cite{fabrizio2016using}研究了使用非合作辐射源发射器作为活动的参考源来提高天波雷达坐标配准精度。其使用澳大利亚Jindalee天波超视距雷达的实验数据，提出并分析了利用高频广播接受到的辐射源信号作为坐标配准的有效已知参考点源的方法。
 
-% In \cite{cuccoli2011coordinate}, Cuccoli~{\emph et. al.} studied the problem of range coordinate registration leveraging the geomorphological structure of the surveillance area. The geographical information including coastlines is represented by sea/land binary mask, which is further converted to a reference signal depending on the equivalent ionospheric reflection height. The right equivalent ionospheric reflection height is determined by maximizing the cross-correlation between the received radar echo and the surface mask signatures. However, they assume the OTHR transmits single pulse signals and numerical simulation results are provided.
-Cuccoli\cite{cuccoli2011coordinate}等人提出利用监控区域的地貌结构研究范围坐标登记问题。 包括海岸线的地理信息由海/陆二进制掩码表示，根据等电离层反射高度进一步转换为参考信号。 通过最大化接收的雷达回波和表面掩模签名之间的互相关来确定正确的等效电离层反射高度。 然而，他们假设OTHR传输单脉冲信号，并提供数值模拟结果。
-% In \cite{cacciamano2012coordinate}, Target detection in Over-The-Horizon (OTH) radars is accomplished by tracking returns in slant range, Doppler and azimuth. Coordinate registration (CR) is the process of localizing the target by converting the slant coordinates to ground coordinates for all the frequencies used in transmission. The CR method uses a 3D ray-tracing algorithm which provides the ground range distance reached with a specific transmission frequency and elevation angle. The ray-tracing approach here adopted uses a 3D electron density model variable with height, latitude and longitude. The ray-tracing output is generally affected by errors due to numerical approximations of the 3D ionosphere model and discretization step used to integrate the differential equations of ray-tracing algorithm. Therefore the raw CR diagram suffers from an error which introduces as a consequence a degradation of target localization accuracy. Accordingly, we propose a coordinate registration technique for OTH sky-wave radars based on 3D ray-tracing that uses the sea-land transitions to mitigate the CR errors. The approach is based on the a priori knowledge of actual group delays relative to the sea-land transition within the area illuminated by the radar antenna beam. The method takes advantage of the geomorphological structure of the surveillance area. The errors introduced by the 3D ray-tracing software are then evaluated by using the actual group delay sat sea-land transitions.Afterwards, the estimated errors are used to correct the coarse CR diagram that was obtained straightforward from the ray-tracing output. Finally, the proposed correction method has been verified under the simplified assumption of a horizontally stratified ionosphere.
-在\cite{cacciamano2012coordinate}中，超视距（OTH）雷达中的目标检测通过跟踪倾斜范围，多普勒和方位角的返回来实现。坐标注册（CR）是通过将倾斜坐标转换为传输中使用的所有频率的地面坐标来定位目标的过程。 CR方法使用3D光线跟踪算法，其提供具有特定传输频率和仰角的地面距离距离。这里采用的光线跟踪方法采用高度，纬度和经度的3D电子密度模型变量。射线跟踪输出通常受到三维电离层模型数值近似误差的影响，离散化步骤用于积分光线跟踪算法的微分方程。因此，原始CR图受到误差的影响，导致目标定位精度的降低。因此，我们提出了一种基于3D射线跟踪的OTH天波雷达的坐标配准技术，该雷达使用海陆转换来减轻CR误差。该方法基于对由雷达天线波束照射的区域内相对于海陆转变的实际组延迟的先验知识。该方法利用了监视区域的地貌结构。然后通过使用实际的组延迟饱和海陆转换来评估由3D射线跟踪软件引入的误差。之后，使用估计的误差来校正从射线跟踪输出直接获得的粗略CR图。最后，在水平分层的电离层的简化假设下，验证了所提出的修正方法。
-
-% In \cite{fabrizio2016using}, A skywave over-the-horizon radar (OTHR) can detect and track aircraft or surface targets at ranges of 1000 to 3000 km by reflecting high frequency (HF) signals from the ionosphere. Coordinate registration (CR) is the process of registering OTHR tracks from radar to geographic coordinates. CR is often performed by ray-tracing through a real-time ionospheric model (RTIM). Opportunistic scatterers that produce identifiable radar returns from known reference points (KRPs) may also be exploited for CR. To complement traditional passive KRP sources, this paper investigates the use of uncooperative emitters of opportunity as active KRP sources to enhance OTHR track geo-registration accuracy. A method that utilizes a HF radio broadcast signal as an active KRP source for CR is presented and analyzed using experimental data from the Australian Jindalee OTHR network (JORN).
-
-天文望远镜雷达（OTHR）\cite{fabrizio2016using}可以通过反射来自电离层的高频（HF）信号来检测和跟踪1000到3000公里范围内的飞机或地面目标。 协调注册（CR）是将OTHR轨道从雷达注册到地理坐标的过程。 CR通常通过实时电离层模型（RTIM）进行射线跟踪。 从已知参考点（KRP）产生可识别的雷达回报的机会散射体也可能被用于CR。 为了补充传统的被动KRP源，本文研究了使用不合作的机会发射器作为活动的KRP源来提高OTHR跟踪地理登记精度。 使用澳大利亚金达莱OTHR网络（JORN）的实验数据，提出并分析了利用HF无线电广播信号作为CR的有效KRP源的方法。
-% In \cite{turley2013high}, Skywave radar exploit the ionospheric medium to illuminate and track targets at long ranges over vast areas. To achieve optimal performance in the dynamic clutter and noise environment cognitive radar techniques are used to advise waveform parameter and coordinate registration for localisation of targets. Here we introduce an experimental high spatial resolution support-radar that remotely senses surface backscatter clutter. A robust algorithm is described for analysis of the Doppler spectra to determine land or sea backscatter origin. The sensed land-sea interfaces can thus be used for direct registration of nearby targets or assimilation into an ionospheric map.
-Skywave雷达利用电离层介质来照射和追踪大范围的远距离目标\cite{turley2013high}。 为了在动态杂波和噪声环境中实现最佳性能，认知雷达技术用于建议波形参数和协调目标定位的配准。 这里我们介绍一个远程感测表面反向散射杂波的实验高空间分辨率支持雷达。 描述了用于分析多普勒频谱以确定陆地或海洋后向散射起源的鲁棒算法。 感测到的陆 - 海界面因此可用于附近目标的直接登记或同化到电离层地图。
-% In \cite{coutts2015low}, High fidelity electromagnetic modeling of the wave propagation field is essential to accurately assess the impact of wind-turbine modulated ground clutter on high frequency (HF) Over-The-Horizon (OTH) radar performance. To support the modeling effort, field measurements were conducted in 2014 near the AN/TPS-71 HF Relocatable Over-the-Horizon Radar (ROTHR) in Virginia to investigate wave propagation near the ground. Extensive propagation data were collected by transmitting from a helicopter-borne HF transmitter to a number of monopole antennas on the ground near the ROTHR receive site at three HF frequencies (7.5 MHz, 14.5 MHz, and 23.5 MHz) and various elevation angles from five to zero degrees (grazing incidence) as measured from the receive antenna. The measurement ranges varied from 5 to 40 km and the helicopter altitudes varied from ground level up to 6000 feet. The measurement results are well correlated with model-based predictions for a smooth-homogeneous-earth surface provided that the ¡°effective¡± dielectric constant and conductivity of the terrain are reduced from their expected values as estimated from in situ soil samples and the National Land Cover Database.
-对于准确评估风力发电机调制地面杂波对高频（HF）地平线（OTH）雷达性能的影响，波传播场的高保真电磁建模至关重要\cite{coutts2015low}。为了支持建模工作，在2014年在弗吉尼亚州的AN / TPS-71 HF可重定位超地平线雷达（ROTHR）附近进行了现场测量，以研究地面附近的波浪传播。通过从直升机传送的HF发射机到ROTHR接收站附近的地面上的多个单极天线，以三个HF频率（7.5MHz，14.5MHz和23.5MHz）和五个仰角从五个到从接收天线测量的零度（掠入射）。测量范围从5到40公里不等，直升机高度从地面高度变化到6000英尺。测量结果与平滑均质地球表面的基于模型的预测有很好的相关性，前提是地形的“有效”介电常数和电导率从其预期值降低，如从原位土样和国家土地覆盖数据库。
-
-% In \cite{holdsworth2017skywave}, Skywave over-the-horizon radar exploits ionospheric propagation to detect and track targets at long range over vast areas. To achieve optimal performance in the dynamic propagation, clutter and noise environment cognitive radar techniques are used to inform waveform parameter selection and improve coordinate registration for localization of targets. In this paper we investigate the use of Earth surface and infrastructure backscatter to aid in coordinate registration. A transponder was placed in the vicinity of a window turbine farm and a mountain range producing strong backscatter. Terrain echoes are shown to provide similar azimuth-range-Doppler information to the transponder echo with similar temporal coverage. Wind turbine echoes are shown to provide azimuth-range information albeit with less temporal coverage than the transponder and terrain echoes.
-
-Skywave超视距雷达利用电离层传播来检测和跟踪广泛地区的远距离目标\cite{holdsworth2017skywave}。 为了在动态传播，杂波和噪声环境中实现最佳性能，认知雷达技术用于通知波形参数选择，提高目标定位的坐标登记。 在本文中，我们研究使用地球表面和基础设施反向散射来协助协调注册。 一个转发器被放置在一个窗户涡轮机场附近，一个产生强烈反向散射的山脉。 地形回波被显示为具有类似时间覆盖的应答器回波提供类似的方位范围 - 多普勒信息。 风力发电机回波被显示为提供方位角范围信息，尽管它具有比应答器和地形回波更少的时间覆盖。
+天波超视距雷达利用电离层传播来检测和跟踪远距离目标。为了在传播模式不确定、杂波和噪声环境中实现最佳性能，Holdsworth\cite{holdsworth2017skywave}提出了一种利用地表回波的反向散射强度，提高目标定位精度的坐标配准方法。
 \section{辐射源类别识别}
+随着科学技术的进步，现代战场形势瞬息万变，信息对抗在现代军事中的作用越来越重要。纵观整个 20 世纪所爆发的两次世界大战和数次局部战争、21 世纪初的美阿、美伊之战以及最近闹得沸沸扬扬的韩国的萨德事件，无一不昭示着现代战争已成为电子战的“天下”，电子战技术也在历次实战演练中逐渐成熟。电子战也称电子对抗，包括电子侦察、电子攻击和电子防护三个方面。电子侦察主要指从敌方雷达及其武器系统获取有用信息,通过雷达辐射源个体识别，可以对战场环境中敌我双方雷达辐射源的分布情况实施侦察，提供更加全面的、精确的电磁斗争与武器的态势，进行有效的战场指挥与决策，雷达辐射源个体识别已成为当前电子战特别是电子侦察领域的研究热点和难点\cite{matuszewski2008specific}。然而由于辐射源的特征未知、信号波形日趋复杂、战时电磁环境恶劣，给辐射源的精确识别带来了越来越严峻的挑战。
 
-辐射源的快速、准确和鲁棒的自动目标识别在现代军事中的作用十分重要，自动目标识别算法需要可以准确区分出已知目标和未知目标，同时可以正确的对于已知目标进行分类。我们需要在未收集大量数据的前提下，可以迅速的识别出新的目标。与传统的利用已知类别的样本进行训练测试的机器学习算法不同，我们这个问题是在Open Set的情况下，将需要考虑将输入识别为未知的情况。本文利用深度卷积神经网络与支持向量机进行结合，以雷达信号的模糊函数作为训练样本，构建了一个可以对未知分类进行识别的分类器。我们利用实际数据进行验证，证明我们的分类器具有很强的准确性。
-随着科学技术的进步，现代战场形势瞬息万变，信息对抗在现代军事中的作用越来越重要。纵观整个 20 世纪所爆发的两次世界大战和数次局部战争、21 世纪初的美阿、美伊之战以及最近闹得沸沸扬扬的韩国的萨德事件，无一不昭示着现代战争已成为电子战的“天下”，电子战技术也在历次实战演练中逐渐成熟。电子战也称电子对抗，包括电子侦察、电子攻击和电子防护三个方面。电子侦察主要指从敌方雷达及其武器系统获取有用信息,通过雷达辐射源个体识别，可以对战场环境中敌我双方雷达辐射源的分布情况实施侦察，提供更加全面的、精确的电磁斗争与武器的态势，进行有效的战场指挥与决策，雷达辐射源个体识别已成为当前电子战特别是电子侦察领域的研究热点和难点。然而由于辐射源的特征未知、信号波形日趋复杂、战时电磁环境恶劣，给辐射源的精确识别带来了越来越严峻的挑战。
+在雷达辐射源信号特征挖掘方面,己有很多学者作了大量研究工作,在上世纪70年代国外相关研究人员就开始了该部分的研究\cite{therrien1974application}，该部分研究可以分为两个阶段:
 
-在雷达辐射源信号特征挖掘方面,己有很多学者作了大量研究工作,在上世纪70年代国外相关研究人员就开始了该部分的研究，该部分研究可以分为两个阶段:
-第一阶段为辐射源基本参数特征研究。对于原始信号特征直接求取其载波频率、脉冲宽度、脉冲幅度、到达角度和到达时间等信息，利用其中一个或多个作为特征向量。这种情况主要是应用于电磁环境相对单一、辐射源类别较少、信号形式单一、雷达参数固定的早期。
+第一阶段为辐射源基本参数特征研究。对于原始信号特征直接求取其载波频率、脉冲宽度、脉冲幅度、到达角度和到达时间等信息\cite{徐欣2001雷达截获系统实时信号分选处理技术研究}，利用其中一个或多个作为特征向量。这种情况主要是应用于电磁环境相对单一、辐射源类别较少、信号形式单一、雷达参数固定的早期。
 
-第二阶段自20世纪90年代以来，西方的军事强国开始研究雷达辐射信号的脉内特征，相继提出了了多种分析雷达信号脉内特征的方法。有代表性的工作有:时域波形分析法、谱相关法、基于专家知识信号处理法、时频综合法、小波分析法、信息理论准则与聚类技术综合法、脉内瞬时频率特征与累积法、信号的分型特征等。
+第二阶段自20世纪90年代以来，西方的军事强国开始研究雷达辐射信号的脉内特征，相继提出了了多种分析雷达信号脉内特征的方法。有代表性的工作有:时域波形分析法\cite{roe1994real}、谱相关法\cite{jouny1995radar,zhang2001new}、基于专家知识信号处理法\cite{melvin2006knowledge,roe1990knowledge,capraro2006knowledge}、时频综合法\cite{rose1996emitter,chen1999joint,li2011quadratic,moraitakis2000feature}、小波分析法\cite{cohen2002importance}、信息理论准则与聚类技术综合法\cite{zhou1999combining}、脉内瞬时频率特征\cite{kawalec2004radar}与累积法\cite{aubry2011cumulants}、信号的分型特征等\cite{dudczyk2013identification,zhang2003fractal,dudczyk2013fractal}。
 
-国内对雷达辐射源个体识别技术的研究始于上世纪 80 年代初，虽然起步较晚，但受到了军方的高度重视，在“九五”、“十五”和“十一五”国防预研中给予了大力资助。在脉内特征挖掘方面，毕大平提出易于工程实现的脉内瞬时频率提取技术；张葛祥提出了雷达辐射源信号的小波包特征、相像系数特征、熵特征、粗集理论、信息维数和分形盒维数；朱明提出了基于原子分解的特征、基于Chirplet原子的特征、时频原子特征；普运伟提出了瞬时频率派生特征、模糊函数主脊切面特征；陈稻伟提出了符号化脉内特征、围线积分双谱特征等；余志斌提出的局域波分解、小波脊频级联特征。
+国内对雷达辐射源个体识别技术的研究始于上世纪80年代初，虽然起步较晚，但受到了军方的高度重视，在“九五”、“十五”和“十一五”国防预研中给予了大力资助。在脉内特征挖掘方面，毕大平提出易于工程实现的脉内瞬时频率提取技术\cite{毕大平2005基于瞬时频率的脉内调制识别技术}；张葛祥提出了雷达辐射源信号的小波包特征\cite{张葛祥2006基于小波包变换和特征选择的雷达辐射源信号识别}、相像系数特征\cite{张葛祥2005基于相像系数的雷达辐射源信号特征选择}、熵特征\cite{张葛祥2005基于熵特征的雷达辐射源信号识别}、粗集理论\cite{张葛祥2005基于粗集理论的雷达辐射源信号识别}、信息维数\cite{张葛祥2005雷达辐射源信号智能识别方法研究}和分形盒维数\cite{张葛祥2003雷达辐射源信号分形特征研究,张葛祥2004雷达辐射源信号脉内特征分析}；朱明提出了基于原子分解的特征\cite{朱明2007基于原子分解的辐射源信号二次特征提取}、基于Chirplet原子的特征、时频原子特征\cite{朱明2009一种基于}；普运伟提出了瞬时频率派生特征\cite{普运伟2009雷达辐射源信号瞬时频率派生特征分类方法}、模糊函数主脊切面特征\cite{普运伟2008雷达辐射源信号模糊函数主脊切面特征提取方法}；陈稻伟提出了符号化脉内特征\cite{陈韬伟2008雷达辐射源信号符号化脉内特征提取方法}、围线积分双谱特征\cite{陈韬伟2013基于围线积分双谱的雷达辐射源信号个体特征提取}等；余志斌提出的局域波分解\cite{余志斌2008基于局域波分解的雷达辐射源信号时频分析}、小波脊频级联特征\cite{余志斌2010一种新的,余志斌2010基于小波脊频级联特征的雷达辐射源信号识别}。
 
-另一方面，雷达辐射源识别是一个典型的分类问题，其主要思路为在得到辐射源信号的特征表示之后，借助有效的分类算法来实现特征空间到决策空间的转换，从而确定信号的所属类别。大量的分类算法被成功运用于雷达辐射源识别中，如模板匹配、神经网络、支持向量机等。一般被应用于该领域的有三种分类方法，一种是判别型分类器，其需要在学习过程中最优化某种目标函数；另一种为生成模型分类器，其主要是基于先验概率和类别条件概率密度进行估计，如线性判别分类器、K最近邻等；第三种是决策树分类算法，通过人类专家的先验知识进行分类，如ID3、C4.5算法。
+另一方面，雷达辐射源识别是一个典型的分类问题，其主要思路为在得到辐射源信号的特征表示之后，借助有效的分类算法来实现特征空间到决策空间的转换，从而确定信号的所属类别。大量的分类算法被成功运用于雷达辐射源识别中，如模板匹配\cite{dudczyk2015fast,dudczyk2004applying}、神经网络\cite{jouny1993classification,petrov2013identification,shieh2002vector,willson1990radar}、支持向量机\cite{ren2008radar}等。一般被应用于该领域的有三种分类方法，一种是判别型分类器，其需要在学习过程中最优化某种目标函数；另一种为生成模型分类器，其主要是基于先验概率和类别条件概率密度进行估计，如线性判别分类器\cite{mika1999fisher}、K最近邻\cite{cover1967nearest}等；第三种是决策树分类算法，通过人类专家的先验知识进行分类，如ID3、C4.5算法\cite{quinlan1996bagging,lyden1999id1}。
+
+辐射源的快速、准确和鲁棒的自动目标识别在现代军事中的作用十分重要，自动目标识别算法需要可以准确区分出已知目标和未知目标，同时可以正确的对于已知目标进行分类。我们需要在未收集大量数据的前提下，可以迅速的识别出新的目标。与传统的利用已知类别的样本进行训练测试的机器学习算法不同，我们这个问题是在Open Set的情况下，将需要考虑将输入识别为未知的情况。第四章利用深度卷积神经网络与支持向量机进行结合，以雷达信号的模糊函数作为训练样本，构建了一个可以对未知分类进行识别的分类器。我们利用实际数据进行验证，证明我们的分类器具有很强的准确性。
 
 \section{论文研究内容及结构}
+
+本文主要研究内容是基于深度学习的雷达信号处理技术，研究重点为深度学习方法在天波雷达地海杂波识别和辐射源分类中的应用。针对于复杂环境下天波雷达地海杂波的不确定性以及在含有未知分类的情况下的辐射源识别两个主要方面进行研究，本文各章安排如下：
+
+第一章为绪论，主要介绍了天波超视距雷达地海杂波识别的意义以及发展，辐射源类别识别的国内外研究现状。
+
+第二章为深度卷积神经网络。该章主要是基本的深度学习理论的相关介绍。
+
+第三章为基于深度学习的地海杂波识别。根据天波超视距雷达的频谱信息，利用一维卷积神经网络作为分类器区分出获取的杂波类型。在实际数据的验证中，即使是在电离层环境很差的情形下，该算法仍然具有很高的精确度。并且将识别结果与实际的地图轮廓进行了匹配，仍然具有很高的匹配率。
+
+第四章为基于深度学习的辐射源未知分类识别。针对于复杂电磁环境下辐射源识别困难的问题，设计了一个深度卷积神经网络，利用模糊函数作为特征实现了对于已知类别的辐射源的识别，同时设计了一个Meta-Recognization，对于识别结果做了进一步的处理，实现了未知分类的辨别。利用实际的雷达数据进行验证，该算法具有很高的识别准确率和分辨正确率。
+
+第五章对全文进行总结，并对后续的研究方向进行了探讨。

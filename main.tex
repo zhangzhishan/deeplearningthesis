@@ -7,8 +7,15 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{standalone}
 
 \usepackage{lipsum}
+
+\usepackage{color}
+
+\usepackage{tikz}
+\usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
 
 \schoolno{10699}
 %\classno{}
@@ -32,7 +39,7 @@
 % 英文摘要
 \include{preface/e_abstract}
 
-\tableofcontents 
+\tableofcontents
 
 \mainmatter
 
@@ -45,15 +52,22 @@
 
 \backmatter
 \bibliographystyle{nputhesis}
-\bibliography{Reference}
+\bibliography{references/reference.bib,references/emitter.bib}
 
 \Appendix
-This is appendix.
+\input{appendix/appendix.tex}
+
+% This is appendix.
 
 \Thanks
-This is a thanks.
+\input{appendix/acknowledgements.tex}
+
+% This is a thanks.
 
 \Work
+\input{appendix/work.tex}
+
+% fajkfa 
 % TODO 如何直接引用使参考文献的内容显示在这里
 
 \statement
