@@ -17,16 +17,17 @@
 \usepackage{tikz}
 \usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
 
+\usepackage{multirow}
 \schoolno{10699}
-%\classno{}
+\classno{TP27}
 %\secretlevel{}
 %\title{\LaTeX 论文模板之模板模板模板}
 \title[Radar Signal Process Based on Deep Learning]{基于深度学习的雷达信号处理}
 \author[Zhishan Zhang]{张治山}
 \authorno{2015201518}
-\major[Math]{数学}
-\supervisor[Shan]{山}
-\applydate[September 2016]{2016~年~9~月}
+\major[Math]{控制理论与控制工程}
+\supervisor[Pan Quan]{潘泉}
+\applydate[March 2018]{2018~年~3~月}
 \support{本文研究得到某某基金(编号:XXXXXXX)资助。}
 
 \begin{document}
@@ -52,7 +53,7 @@
 
 \backmatter
 \bibliographystyle{nputhesis}
-\bibliography{references/reference.bib,references/emitter.bib}
+\bibliography{references/reference,references/emitter}
 
 \Appendix
 \input{appendix/appendix.tex}
@@ -66,9 +67,6 @@
 
 \Work
 \input{appendix/work.tex}
-
-% fajkfa 
-% TODO 如何直接引用使参考文献的内容显示在这里
 
 \statement
 \end{document}
