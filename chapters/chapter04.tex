@@ -1,40 +1,66 @@
 \chapter{基于深度学习的辐射源未知分类识别}
 % TODO:增加内容与仿真！！！
 % 对比利用不同的，添加具体参数的设置。
-% 不同迭代次数，识别正确率表格对比 
 
-% 学习次数 
-% 正确学习测
-% 试样本集个
-% 数 
-% 测试样本集
-% 学习正确率 
-% 正确学习训
-% 练样本集个
-% 数 
-% 训练样本集
-% 学习正确率 
-% 平均学习时
-% 间（h）
-% 
-% 三个测试精度均可以列到表格里
+
+% 可以考虑进行未经过模糊函数处理和处理之后的对比
 
 % 不同卷积核  学习率  不同卷积核个数
 % 层数 节点数等
 % 不同训练方法
 % 多类别的分类结果图可以参考
 % 不同数据的各自的图
-% 原始IQ数据
-\section{引言}
-在辐射源识别领域，我国在跟踪发达国家研究进展的基础上也开始加紧研发可装备于军方的SEI系统，以逐步缩小与发达国家在技术实用方面的差距。但总体来说，我国在该方面的研究还赶不上美英等发达国家，除了缺乏深层次且系统化的理论分析研究外，更缺乏成熟的工程化系统实践和实际装备，因而迫切需要加快在该领域的理论研究和应用步伐。本章综合雷达信号处理、深度学习等多学科理论，重点围绕在复杂电磁环境下不同辐射源的个体识别所面临的识别能力差等问题与挑战，提出合理的雷达脉内细微特征模型，结合深度学习的理论与方法，解决传统辐射源识别方法的局限性，为雷达辐射源识别提供理论支撑于技术指导
 
-\textcolor{red}{详细分析不同辐射源雷达信号的差别，研究不同雷达的信号建模过程以及据此获取雷达信号的基本特征；对雷达有意调制和无意调制这两种脉内调制形式进行建模，综合分析其对应的各种特征（瞬时自相关、相位差分法、模糊函数等）；综合考虑各种脉内细微特征，建立基于深度学习的分类结构；结合大量数据，对结构进行验证和调整；基于实际数据，对算法的各种特性进行验证。}
+\section{引言}
+\textcolor{red}{5723/9500}
+
+辐射源识别算法需要可以准确区分出已知目标和未知目标，同时可以正确的对于已知目标进行分类。我们需要在未收集大量数据的前提下，可以迅速的识别出新的目标。与传统的利用已知类别的样本进行训练测试的机器学习算法不同，本章的问题是在Open Set的背景下，需要考虑输入未知分类样本的情况。由于复杂电磁环境下不同辐射源的个体识别所面临的识别能力差等问题与挑战，传统辐射源识别方法具有很大的局限性，我们需要提出合理的雷达脉内细微特征模型，并寻找一种新的方法解决该问题。
+
+本章综合雷达信号处理、深度学习等多学科理论，详细分析不同辐射源雷达信号的差别，研究不同雷达的信号建模过程以及据此获取雷达信号的基本特征）；综合考虑各种脉内细微特征，利用深度卷积神经网络与支持向量机进行结合，以雷达信号的模糊函数切片作为训练样本的特征向量，构建了一个可以对未知分类进行辨识的分类器。最后，利用实际数据进行验证，证明我们的分类器具有很高的准确性。
+
+本章安排如下： 4.2节对辐射源信号进行了分析，并对其进行预处理，求取其模糊函数切片，4.3节构建了本章的Open Set 分类器，详细地阐述了深度卷积神经网络这个主分类器与支持向量机Meta分类器的设计过程，4.4节利用实际数据对于分类器已知分类识别和未知分类辨别的性能进行了验证，4.5节进行本章总结。
+
+% \textcolor{red}{；对雷达有意调制和无意调制这两种脉内调制形式进行建模，综合分析其对应的各种特征（瞬时自相关、相位差分法、模糊函数等建立基于深度学习的分类结构；结合大量数据，对结构进行验证和调整；基于实际数据，对算法的各种特性进行验证。}
 
 \section{辐射源信号分析}
+\textcolor{red}{我们此处获得的为相关雷达的I/Q两路数据，这是一种在雷达信号处理领域常见的用来描述信号的方法。其中I表示In-Phase，即同相，Q表示Quadrature，即正交，与I相位之差为90度。对于实际的信号，设其峰值幅度为$A$、相位角为$\phi$,则有：
+\begin{equation}
+	I = A\cos{\phi}
+\end{equation}
+\begin{equation}
+	Q = A\sin{\phi}
+\end{equation}
+\begin{equation}
+	A=\sqrt{I^2+Q^2}
+\end{equation}
+\begin{equation}
+	\phi=tan^{-1}(Q/I)
+\end{equation}
+也即，可以利用公式\ref{equ:signal}表示信号：
+\begin{equation}
+	Ae^{i\phi}=A(\cos(\phi) + i\sin(\phi))=I+Qi
+	\label{equ:signal}
+\end{equation}
+对于我们的气象雷达辐射源信号，在原始的I/Q数据的示意图如图 \ref{fig:IQ} 所示
+\begin{figure}
+	\centering
+	\includegraphics[width=0.2\textwidth]{figures/struct_emitter.pdf}
+	\label{fig:IQ}
+	\caption{原始I/Q信号}
+\end{figure}
+}
 
 对于辐射源信号的处理，本章主要考虑两方面：信号预处理、特征提取优化。
 
 在信号预处理方面，首先需要剔除无用和错误的数据。然后将信号进行分选，其主要是从随机交叠的脉冲信号流中分离出各个雷达的脉冲信号并选出有用信号。其实质是去交叠、去交错，所利用的是同一部雷达信号参数的相关性和不同雷达信号参数的差异性。
+
+从中选取三个类别的I/Q信号图，得到如图 \ref{fig:IQs} 所示，从中可以看出各个信号之间的差距并不明显，因此我们对原始信号进行了优化。
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.2\textwidth]{figures/struct_emitter.pdf}
+	\label{fig:IQs}
+	\caption{原始I/Q信号}
+\end{figure}
 
 在特征提取优化方面，合理的特征是分类识别的基础。本章通过对\textcolor{red}{雷达信号的各种特征分析}，最终选取了雷达模糊函数的切片作为特征。
 
@@ -45,7 +71,7 @@
 A(\tau,\nu) = \int_{-\infty}^{+\infty}R_x(t,\tau)e^{j2\pi\nu t}dt
 \label{equ:defineaf}
 \end{equation}
-即$R_x(t,\tau)$关于时间$t$的傅里叶反变换。由于在实际中发射机自身存在相位噪声以及各类杂散输出，故可以区分出型号、参数均相同的辐射源，通过模糊函数在时延和频偏这二维上的变换，可以多角度的刻画出无意调制对于发射信号的影响。
+即$R_x(t,\tau)$关于时间$t$的傅里叶反变换。由于在实际中发射机自身存在相位噪声以及各类杂散输出，故可以区分出型号、参数均相同的辐射源，通过模糊函数在时延和频偏这两个维度上的变换，可以多角度的刻画出无意调制对于发射信号的影响。
 
 为了方便在数字信号中使用，式\ref{equ:defineaf}可以经过变换等价于下面的形式：
 \begin{equation}
@@ -58,31 +84,32 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 \end{equation}
 其中，$\tau_l=l/f_s$,$\nu_m=mf_s/N$。
 
+\textcolor{red}{模糊函数三维图像，从该三维曲线图可以看出，其模糊函数的主要变化均处于0偏移和0频偏附近。为了减小计算量，我们这里采用该处的切片用来作为特征。
+}
+
+模糊函数三维图像
+
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/af.pdf}
-	\caption{模糊函数切片图}
+	\caption{模糊函数切片示意图}
 \end{figure}
 
 \section{Open Set 分类器设计}
-\textcolor{red}{openset定义}\cite{scheirer2013toward, jain2014multi}
-
-Open Set目标识别系统必须可以准确的处理下面三种类型的数据类：
+通常的识别或者分类系统仅考虑的是一个闭集分类系统，然而在现实世界中，这种分类系统会遇到很大的问题。由于其最基本的假设是所有的类别均为先验已知，那么就会出现问题，例如在训练样本中不存在类别的样本就会被错误的分到某个类别中去。这种在训练的时候提供不完整的信息，而在测试的时候会添加未知分类的问题，称作Open Set 识别\cite{scheirer2013toward, jain2014multi}。这个问题还可以描述为需要在测试的时候拒绝未知样本。Open Set目标识别系统必须可以准确的处理下面三种类型的数据类：
 \begin{itemize}
 	\item 已知的（目标）类，被标记为正训练样本的数据。
 	\item 已知的未知（非目标）类，被标记为负训练样本的数据。
 	\item 未知的未知（非目标）类，在训练样本中不存在的类别的数据。
 \end{itemize}
-国内外对于Open Set的识别也早有研究，Simonson\cite{simonson1998probabilistic}提出了一种称作\textit{probabilistic fusion} (PF)的利用统计的方法来进行Open Set识别，其主要通过合并来自不同数据源的证据得到一个统计测试模型，根据此模型的分布来对于类别进行判断。Scheirer等人\cite{scheirer2011meta}提出了一种通过分析后验数据得分来进行类型判断的方法。
+传统的机器学习算法均为针对于闭集数据设计的，随着识别算法应用场景的增多和对精度要求的提高，许多学者开始了对Open Set识别的研究。Simonson\cite{simonson1998probabilistic}提出了一种称作\textit{probabilistic fusion} (PF)的利用统计的方法来进行Open Set识别，其主要通过合并来自不同数据源的证据得到一个统计测试模型，根据此模型的分布来对于类别进行判断。Scheirer等人\cite{scheirer2011meta}提出了一种通过分析后验数据得分来进行类型判断的方法。
 
-此部分主要解决的问题是当得到一个新的测试样本，如果该样本不属于已经经过训练的分类，那么传统的神经网络模型会将该样本指派给与其最相似的一个类别，此种情况对于一个Open Set识别系统，也即类似于辐射源识别系统这种具有较多尚未经过训练的样本的一个数据集，首先这会导致其识别率下降，另一方面是由于对于未知的辐射源无法很好的确定，无法很好的完成预警等任务。国内外学者对于该问题的研究主要分为下面两个思路：
+此部分主要解决的问题是当得到一个新的测试样本，如果该样本不属于已经经过训练的分类，那么传统的神经网络模型会将该样本指派给与其最相似的一个类别，此种情况对于一个Open Set识别系统，也即类似于辐射源识别系统这种具有较多尚未经过训练的样本的一个数据集，首先这会导致其识别率下降，另一方面是由于对于未知的辐射源无法很好的确定，无法很好的完成预警等任务。目前，学者对于该问题的研究主要分为下面两个思路：
 \begin{itemize}
 	\item 在训练集中添加一个“未知”类别，利用不同的来自非已知类别的数据作为训练样本对该类别进行训练，然后对于所有的输入数据进行类别的识别，对于识别结果为该类别的数据作为未知分类。
 	\item 针对于多分类使用的softmax函数，可以设立阈值或者对于该识别结果进行一个评价（例如与已知类别数据的一个“距离”），通过这种方式分辨出未知分类。
 \end{itemize}
 思路1最大的问题是我们无法得到所有可能的未知类别的样本来进行训练，具有一定的局限性，不适用于我们这个具有大量来自未知分类数据的问题。针对于该问题，我们基于思路2的想法设计了一个基于Meta-Recognition的可以识别未知辐射源的深度神经网络。首先是创建一个深度卷积神经网络分类器，该分类器的输出为该训练样本属于各个类别的概率，我们然后将此类别作为一个输入，输入到我们的Meta-Recognition中，这里我们设计一个支持向量机分类器作为Meta-Recognition，然后从该Meta-Recognition会进行判断该输入是否为一个未知分类。
-
-\textcolor{red}{用新图，专利或者项目中的}
 
 \begin{figure}
 	\centering
@@ -92,10 +119,12 @@ Open Set目标识别系统必须可以准确的处理下面三种类型的数据
 
 
 \subsection{深度卷积神经网络分类器设计}
-\textcolor{blue}{本章根据辐射源信号的实际数据以及其反映出来的特性，构建了基本的具有\textcolor{red}{13}层的卷积神经网络，每层具有多个特征向量，每个特征向量具有多个神经元，并且每个特征向量来自于一种卷积核所提取输入的一种特征。主要过程为对于输入的辐射源信号，进行多次的卷积、池化操作，进行再次特征提取，然后通过BP网络进行训练。
+\textcolor{red}{本章根据辐射源信号的实际数据以及其反映出来的特性，构建了基本的具有\textcolor{red}{13}层的卷积神经网络。
 }
 
 该分类器作为主要分类器，且Meta-Recognition是以该分类器的输出作为输入，所以该分类器性能的好坏会直接影响到对已知类别的分类和对未知类别的判断。
+
+\textcolor{red}{不必须谈论输入的向量长度}
 
 由于模糊函数作为输入为一个$1 \times 1000$的向量，基于此我们设计了一个具有7层的一维卷积神经网络。
 \textcolor{red}{这部分缺少详细描述，但是如何和上一个问题区分开来是一个问题}
@@ -112,21 +141,135 @@ Open Set目标识别系统必须可以准确的处理下面三种类型的数据
 % 	\caption{深度卷积神经网络框架图}
 % \end{figure}
 
-\section{支持向量机 Meta-Recognition 设计}
+\subsection{支持向量机 Meta-Recognition 设计}
 
-\textcolor{red}{支持向量机的简介}
+\subsubsection{支持向量机原理}
+支持向量机是一种流行的分类方法，它可以在不需要大量数据的情况下产生良好的结果。对于一个二维分类问题，设$((x_1,y_1)\dots(x_n,y_n))$为训练数据集，其中$x_i$为某样本的特征向量，$y_i\in{-1,+1}$为该样本的标签。支持向量机的思想为找到一个超平面将这些样本划分为正类（标签为+1）和负类（标签为-1），并且使得正类和负类之间的距离最大。这个超平面的margin被定义为正类与负类之间的最近距离。
 
-支持向量机是一种流行的分类方法，因为它们可以在不需要大量数据的情况下产生良好的结果。我们可以利用所有的目标数据和未知目标的数据来作为训练样本对该SVM分类器进行训练，本部分我们以深度卷积神经网络的输出作为该分类器的输入，利用各类别的概率作为其特征进行训练识别。由于在类别的识别过程中，存在一定的波动性，这个会影响对于是否属于未知类别的分类判断，我们这里选取对于来自同一个辐射源的连续10拍的识别结果进行一个平均作为最终的输入。
+对于一个线性分类问题，假设所有的数据满足下面的约束：
+\begin{equation}
+	w\cdot x_i +b \geq + 1 \quad y_i = +1
+	\label{equ:constraint1}
+\end{equation}
+\begin{equation}
+	w\cdot x_i +b \leq + 1 \quad y_i = -1
+	\label{equ:constraint2}	
+\end{equation}
+其中$w$为超平面的normal，$|b|/||w||$是从超平面到原点的垂直距离，$||w||$是向量$w$的欧拉norm。将上述两个式子合并得到：
+\begin{equation}
+	y_i(w\cdot x_i+b)\geq 1 \forall i
+	\label{equ:svm}
+\end{equation}
+公式 \ref{equ:svm} 中的训练样本构成了这个标准分类平面(图 \ref{fig:hyperplanes} 中的$H_1$与$H_2$)。间隔 $\rho$ 可以通过计算$H_1$与$H_2$的距离得到：
+\begin{equation}
+	\rho=\frac{|1-b|}{||w||}-\frac{|-1-b|}{||w||}=\frac{2}{||w||}
+\end{equation}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/hyperplanes}
+	\caption{标准分类平面，即具有最大间隔的超平面。画圆圈的样本组成了这个超平面，其被称作支持向量。}
+	\label{fig:hyperplanes}
+\end{figure}
+因此求解分离超平面的最大margin的问题，就转变为下面的优化问题。
+\begin{equation}
+	\min \limits_{w\in \mathcal{H}} \tau(w)=\frac{1}{2}||w||^2\quad s.t. \quad y_i(w\cdot x_i +b) \geq 1 \quad \forall i
+	\label{equ:optimization}
+\end{equation}
 
-下面是对于SVM分类器的设计，首先是核函数的选择。核函数将输入空间映射到高维特征空间，最终在高维特征空间中构造出最优分离超平面，从而把平面上本身不好分的非线性数据分开。常用的核函数为线性核函数和高斯核函数。对于核函数的选择，一般分为三种情况：
+为了使得约束更好表示，我们用拉格朗日优化算法对上式重新描述，
+\begin{equation}
+	\min \limits_{w,b} L(w,b,\alpha)=\frac{1}{2}||w||^2-\sum_{i=1}^l\alpha_i y_i (x_i w + b) + \sum_{i=1}^l{\alpha_i}
+	\label{equ:lagrange}
+\end{equation}
+其中$\alpha_i \geq 0$为约束条件。
+
+在实际计算过程中，我们通过对偶定义求解优化方程\ref{equ:lagrange}，通过最大化方程\ref{equ:lagrange}相对于$\alpha$来求取其相对于$w$和$b$的最小值。利用 Karush-Kuhn-Tucker 条件，则公式\ref{equ:lagrange}变为下面对偶形式：
+\begin{equation}
+	\max \limits_{\alpha} L_D=\sum_i{\alpha_i}-\frac{1}{2}\sum_{i,j}\alpha_i\alpha_jy_iy_jx_i\cdot x_j \quad s.t. \quad \forall i 
+	\left\{
+		\begin{aligned}
+	   &\sum_i{\alpha_iy_i}=0  \\
+	   &\alpha_i \geq 0
+	   \end{aligned}
+		\right.
+\end{equation}
+因此，通过求解这个对偶优化问题，可以得到系数$\alpha_i$。其中满足$\alpha_i>0$的解称作支持向量，他们位于标准分类平面$H_1$或者$H_2$上。注意到，仅有$\alpha_i>0$的解影响最终的支持向量的选择。
+因此，可以得到决策函数：
+\begin{equation}
+	f(x)=w^Tx_i+b=\sum_{i=1}^My_i\alpha_i(x_i^Tx)+b
+\end{equation}
+决策函数的符号取决于预测样本$x$。
+
+此处我们讨论的情形的一个假设是，我们可以把所有的样本完全分为不同的类别。但是显然在大多数情况下，这种假设是不成立的。另外，这种假设也会导致过拟合现象的出现。因此，文献 xxx 提出了软间隔的支持向量机。
+其基本思想是，通过引入正的松弛变量$\xi_i$来放宽公式\ref{equ:constraint1}和\ref{equ:constraint2}的约束。基于此，得到方程
+
+\begin{equation}
+	\forall i \quad
+	\left\{
+	 \begin{aligned}
+	&w\cdot x_i + b \geq +1-\xi_i \quad y_i=+1  \\
+	&w\cdot x_i + b \leq -1-\xi_i \quad y_i=+1  \\
+	&\xi_i \geq 0
+	\end{aligned}
+	 \right.
+	\label{equ:constraint_soft}
+\end{equation}
+这允许一些样本在边缘内部，甚至在相反类别的情况下进一步交叉（见图\ref{fig:softmargin}）。 虽然这种松弛使得支持向量机能够灵活地降低异常值的影响，但是从优化问题求解的角度来看，我们不希望有任意大的松弛变量$\xi_i$，因为这会导致SVM获得平凡和次优的解。 因此，我们通过使松弛变量成为目标函数\ref{equ:optimization}的一部分，来限制松弛度：
+\begin{equation}
+	\min \limits_{w\in \mathcal{H},\xi\in \mathbb{R}^m} \tau(w,\xi)=\frac{1}{2}||w||^2+C\sum_{i=1}^m {\xi_i}
+\end{equation}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{figures/softmargin}
+	\caption{软间隔支持向量机}
+	\label{fig:softmargin}
+\end{figure}
+其约束条件为公式\ref{equ:constraint_soft}。超参数$C>0$是针对于误分类的惩罚系数，该系数需要根据不同的分类任务和数据集进行调整。
+将其变为的对偶形式，则有
+\begin{equation}
+	\max \limits_{\alpha} L_D=\sum_i{\alpha_i}-\frac{1}{2}\sum_{i,j}\alpha_i\alpha_jy_iy_jx_i\cdot x_j \quad s.t. \quad \forall i 
+	\left\{
+		\begin{aligned}
+	   &\sum_i{\alpha_iy_i}=0  \\
+	   &C \leq \alpha_i \geq 0
+	   \end{aligned}
+		\right.
+	\label{equ:cdotdual}
+\end{equation}
+
+目前只是分析了线性支持向量机的问题，为了应对非线性分类问题，我们引入了核函数的概念。将训练数据通过某函数$\Phi:\mathbb{R}^d\mapsto\mathcal{H}$。经过该变换后，我们只需要将原来计算$\mathbb{R}^d$的$x_i\cdot x_j$变换为计算在$\mathcal{H}$域的向量积$\Phi(x_i)\cdot\Phi(x_j)$。为了降低计算量，可以引入核函数$K$来避免数据$x_i$和$x_j$从$\mathbb{R}^d$映射到$\mathcal{H}$。
+\begin{equation}
+	K(x_i,x_j)=\Phi(x_i)\cdot\Phi(x_j)
+\end{equation}
+因此，可以将公式\ref{equ:cdotdual}变为下式：
+\begin{equation}
+	\max \limits_{\alpha} L_D=\sum_i{\alpha_i}-\frac{1}{2}\sum_{i,j}\alpha_i\alpha_jy_iy_j K(x_i,x_j)\quad s.t. \quad \forall i 
+	\left\{
+		\begin{aligned}
+	   &\sum_i{\alpha_iy_i}=0  \\
+	   &C \leq \alpha_i \geq 0
+	   \end{aligned}
+		\right.
+\end{equation}
+常用的核函数有下面几种：
 \begin{itemize}
-	\item  特征的数量很大，跟样本数量差不多，这时候选用LR或者是线性核的SVM
-	\item  特征的数量比较小，样本数量一般，不算大也不算小，选用高斯核函数
+	\item 线性核函数:$K(x,y)=<x,y>$
+	\item 多项式核函数：$K(x,y)=(<x,y>)^d$
+	\item RBF 核函数:$K(x,y)=exp(\frac{-||x-y||^2}{2\sigma^2}$
+	\item Sigmoid 核函数:$K(x,y)=\tanh(\gamma<x,y>-\theta)$
+\end{itemize}
+\subsubsection{支持向量机设计}
+我们可以利用所有的目标数据和未知目标的数据来作为训练样本对该SVM分类器进行训练，本部分我们以深度卷积神经网络的输出作为该分类器的输入，利用各类别的概率作为其特征进行训练识别。由于在类别的识别过程中，存在一定的波动性，这个会影响对于是否属于未知类别的分类判断，我们这里选取对于来自同一个辐射源的连续10拍的识别结果进行一个平均作为最终的输入。
+
+下面是对于SVM分类器的设计，首先是核函数的选择。核函数将输入空间映射到高维特征空间，最终在高维特征空间中构造出最优分离超平面，从而把平面上本身不好分的非线性数据分开。常用的核函数为线性核函数和径向基核函数（ Radial Basis Function）。对于核函数的选择，一般分为三种情况：
+\begin{itemize}
+	\item  特征的数量很大，跟样本数量差不多，这时候选用逻辑回归算法或者是线性核的SVM
+	\item  特征的数量比较小，样本数量一般，不算大也不算小，选用径向基核函数
 	\item  特征的数量比较小，而样本数量很多，需要手工添加一些特征变成第一种情况
 \end{itemize}
-由于我们的问题符合情况2，故选择高斯核函数。
+由于我们的问题符合情况2，故选择径向基核函数，。
 
-支持向量机具有两个关键参数，惩罚参数$C$的和核参数$\sigma$，这两个参数的取值在很大程度上决定了SVM的性能的优劣。核函数的参数主要影响样本数据在高维特征空间中分布的复杂程度,即维数。特征子空间的维数越高,那么得到的最优分类超平面就会越复杂。反之亦然。因此只有选择合适的核参数得到合适的特征子空间,才能得到推广能力良好的SVM分类器。本章中用到的是高斯核参数。大量的实验数据表明，如果与样本点之间的距离很小，$\sigma \rightarrow 0$；如果与样本点之间的距离很大时，$\sigma \rightarrow \infty$；当$\sigma$很小，高斯核函数支持向量机得到的判别函数差不多是一个常数，出现过拟合现象。当$\sigma$很大时，样本的正确分类率也会比较低。
+具有径向基核的支持向量机具有两个关键参数，惩罚参数$C$的和核参数$\sigma$，这两个参数的取值在很大程度上决定了SVM的性能的优劣。核函数的参数主要影响样本数据在高维特征空间中分布的复杂程度,即维数。特征子空间的维数越高,那么得到的最优分类超平面就会越复杂。反之亦然。因此只有选择合适的核参数得到合适的特征子空间,才能得到推广能力良好的SVM分类器。大量的实验数据表明，如果与样本点之间的距离很小，$\sigma \rightarrow 0$；如果与样本点之间的距离很大时，$\sigma \rightarrow \infty$；当$\sigma$很小，径向基核函数支持向量机得到的判别函数差不多是一个常数，出现过拟合现象。当$\sigma$很大时，样本的正确分类率也会比较低。
 
 惩罚参数是影响SVM算法性能的另一个重要因素。它的作用主要是调节特征子空间中SVM模型的置信范围与经验风险的比例，使支持向量机的泛化能力达到最好。特征子空间不同时，最优参数值取值也会不同。惩罚参数与经验误差的惩罚和SVM的复杂度成正比，与经验风险值成反比，反之亦然。因此，选择合适的惩罚参数也是非常重要的。
 
@@ -135,13 +278,41 @@ Open Set目标识别系统必须可以准确的处理下面三种类型的数据
 \section{仿真实验与分析}
 \subsection{实验环境}
 \textcolor{red}{关于IQ两路数据的一个叙述}
+本项目利用了来自13架真实飞机的数据，其编号分别为信息参见下表
+\begin{table}[H]
+	\renewcommand{\arraystretch}{1.3}
+	\caption{辐射源信号数据}
+	% \label{tab:nb_classes}
+	\centering
+	\begin{tabular}{c|c|c}
+		\hline
+		 飞机编号 & 飞机班号 & 飞机的型号  \\
+		 \hline
+		 7BF014 & CCA1416 & Airbus A330 (twin-jet)\\
+		 780DB3 & TBA9881 & Airbus A330 (twin-jet) \\
+		 780E06 & CSN3438 & Airbus A330 (twin-jet\\
+		 780EBB & CES293 & 	Airbus A321 (twin-jet)\\
+		 780EBF & CES2342 & Airbus A320 (twin-jet)\\
+		 7804F2 & ZH9164 & Airbus A320 (twin-jet)\\
+		 7804F4 & CES5856 & 737\\
+		 7806FC & CSN6402 & Airbus A320 (twin-jet)\\
+		 7808F0 & CES5373 & Airbus A319 (twin-jet)\\
+		 78057F & CCA4103 & Airbus A321 (twin-jet\\
+		 780063 & CCA4377 & Airbus A319 (twin-jet)\\
+		 780375 & CSC8253 & Airbus A319 (twin-jet)	\\
+		 781022 & EU2731 & Airbus A319 (twin-jet)\\
+		 \hline
+	\end{tabular}
+\end{table}
+
+原始的雷达信号为I/Q信号，我们将他们利用快速傅里叶变换求取其模糊函数切片作为输入的特征向量。每架飞机原始信号为100次雷达扫描周期的信号，为了增加数据样本数目，我们对原始信号添加噪声生成了新的信号，最终每架飞机均有10000组信号。对于这些信号，我们选择其中的$70\%$作为训练样本，$20\%$用于交叉验证，$10\%$作为测试，同时在测试样本中添加与其等量的来自未训练类别也即未知类别的样本共同作为测试样本用来衡量其未知分类的识别率。
 
 由于我们原始获得的数据为IQ两路数据，为了更好的捕捉到回波的特征信息，我们对数据进行了一个变换，求取其模糊函数，并做偏移为0附近的一个切片。由于深度学习需要大量的数据进行训练学习，而本身数据量偏少，故我们在已有数据的基础上在一定信噪比的前提下，生成部分仿真数据。
 
 对于数据的选择方面，我们从数据中选择出2至8个类别分别进行实验，对于每一个类别，我们均选择大约10000组数据，其中$70\%$作为训练样本，$20\%$作为交叉验证样本，$10\%$作为测试样本，同时在测试样本中又添加了与已知分类等数量的未知分类的数据进行测试。
-\begin{figure}
+\begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{figures/diff_data.pdf}
+	\includegraphics[width=6.67cm]{figures/diff_data.pdf}
 	\caption{不同类别样本特征图}
 \end{figure}
 由于该变换后，数据之间的差距比较大，我们对数据进行了归一化。我们采用的归一化方法为min-max标准化（Min-Max Normalization），也称为离差标准化，是对原始数据的线性变换，使结果值映射到$[0 , 1]$之间。转换函数如下：
@@ -150,47 +321,23 @@ x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}}
 \end{equation}
 其中$x_{max}$为样本数据的最大值，$x_{min}$为样本数据的最小值。
 
-我们采用网格搜索法对SVM参数进行调优，最终选择参数惩罚参数为32，核参数$\sigma$为0.0312。
+我们采用\textcolor{red}{网格搜索法}对SVM参数进行调优，最终选择参数惩罚参数为32，核参数$\sigma$为0.0312。
 
 \subsection{实验结果分析}
 
-在上述样本的情形下，我们通过选取不同的类别数目，进行训练和测试得到下表的识别结果。从表中数据我们可以看出，随着样本类别数的增加，对于未知分类的识别准确率也随之有了大幅度的增加，而另一方面随着类别的增加，对于每个类别的识别准确率有一定的降低，但是仍然维持在比较高的水平。
+\subsubsection{深度卷积神经网络识别结果}
+
+\textcolor{red}{该部分是否修改为表格，然后注意描述的时候准确表达所运用的数据，该部分主要利用某一个多类别的进行研究。}
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{figures/diff_epoch.pdf}
 	\caption{迭代次数与识别准确率曲线图}
+	\label{fig:openset_epoch}
 \end{figure}
 
-% \begin{table}[!t]
-% 	\renewcommand{\arraystretch}{1.3}
-% 	\caption{不同类别个数数据识别结果.}
-% 	\label{tab:nb_classes}
-% 	\centering
-% 	\begin{tabular}{ccc}
-% 		\hline
-% 		 样本类别数 & 已知类别识别正确率 & 未知类别分辨正确率 \\
-% 		\hline
-% 		2 & 99.55\% & 84.32\% \\
-% 		\hline
-% 		3 & 98.50\% & 93.10\% \\		
-% 		\hline
-% 		4 & 98.56\% & 97.81\% \\		
-% 		\hline
-% 		5 & 98.48\% & 98.42\% \\		
-% 		\hline
-% 		6 & 96.32\% & 98.85\% \\		
-% 		\hline
-% 		7 & 96.26\% & 99.22\% \\		
-% 		\hline
-% 		8 & 96.08\% & 99.14\% \\		
-% 		\hline
-% 	\end{tabular}
-% \end{table}
-
-
-\begin{table}[!t]
+\begin{table}[H]
 	\renewcommand{\arraystretch}{1.3}
-	\caption{参考表格.}
+	\caption{深度卷积神经网络分类结果.}
 	% \label{tab:nb_classes}
 	\centering
 	\begin{tabular}{c|c|c|c}
@@ -205,6 +352,70 @@ x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}}
 		\hline
 	\end{tabular}
 \end{table}
+
+\begin{table}[H]
+	\renewcommand{\arraystretch}{1.3}
+	\caption{深度卷积神经网络分类结果}
+	% \label{tab:nb_classes}
+	\centering
+	\begin{tabular}{c|c|c|c|c|c}
+		\hline
+		 迭代次数 & 正确学习测试样本集个数 & 测试样本集学习正确率 & 正确学习训练样本集个数 & 训练样本集学习正确率 & 平均学习时间（s） \\
+		 \hline
+		% \multirow{2}{*}{正确分类精度}
+		%  & 类别A & 99.55\% & 0.55\% \\
+		% \cline{2-4}
+		%  & 类别B & 6.90\% & 93.10\% \\		
+		
+		\hline
+	\end{tabular}
+\end{table}
+
+
+对于具有8个类别的数据，我们对于迭代次数与识别准确率进行了验证，其结果如图 \ref{fig:fig:openset_epoch} 所示。
+\subsubsection{Open Set 分类器识别结果}
+
+在上述样本的情形下，我们通过选取不同的类别数目，进行训练和测试得到下表的识别结果。从表中数据我们可以看出，随着样本类别数的增加，对于未知分类的识别准确率也随之有了大幅度的增加，而另一方面随着类别的增加，对于每个类别的识别准确率有一定的降低，但是仍然维持在比较高的水平。
+
+
+\begin{table}[H]
+	\renewcommand{\arraystretch}{1.3}
+	\caption{不同类别个数数据识别结果}
+	\label{tab:nb_classes}
+	\centering
+	\begin{tabular}{ccc}
+		\hline
+		 样本类别数目 & 已知类别识别正确率 & 未知类别分辨正确率 \\
+		\hline
+		2 & 99.55\% & 84.32\% \\
+		\hline
+		3 & 98.50\% & 93.10\% \\		
+		\hline
+		4 & 98.56\% & 97.81\% \\		
+		\hline
+		5 & 98.48\% & 98.42\% \\		
+		\hline
+		6 & 96.32\% & 98.85\% \\		
+		\hline
+		7 & 96.26\% & 99.22\% \\		
+		\hline
+		8 & 96.08\% & 99.14\% \\		
+		\hline
+	\end{tabular}
+\end{table}
+
+对于本章这个Open Set 识别问题，我们需要用别的参数衡量识别的准确度。利用文\cite{scheirer2013toward}中提出的通过训练类别的个数和测试类别的个数来描述数据集的开放度（openness），入公式\ref{equ:openness}
+\begin{equation}
+	openness = 1-\sqrt{\frac{2t}{\eta+e}}
+	\label{equ:openness}
+\end{equation}
+其中，$t$表示训练类别的个数， $\eta $表示目标类别的个数,对于本章的识别问题，有$\eta=1$，$e$表示验证类别的个数，有$e>t,e>\eta$。对于一个完全的闭集识别问题有$e=t$意味着未知类别数据集为空。
+
+另一方面，用F-measure 来衡量该分类器对于未知分类样本的处理情况。其定义为：
+\begin{equation}
+	F-measure=2\times\frac{p\cdot r}{p+r}
+\end{equation}
+其中，$p$表示精确率(precision)，$p=\frac{TP}{TP+FP}$，其中$TP$表示正类预测为正类的样本数目，$FP$表示负类预测为正类的样本数目。$r$表示召回率（recall），$r=\frac{TP}{TP+FN}$，其中$FN$表示正类预测为负类的样本数目。
 
 \section{小结}
 本章针对复杂电磁环境下辐射源的识别面临的电磁信号干扰大、雷达信号参数相近等问题与挑战，利用深度学习的思想与方法，深入研究辐射源脉内细微特征，设计合适的神经网络结构，并基于实际机载气象雷达数据进行初步验证。主要特色与创新点如下：
