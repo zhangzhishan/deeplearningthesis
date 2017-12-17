@@ -1,0 +1,16 @@
+close all
+x = -10:0.1:10;
+ReLU = (1-exp(-2*x))./(1+exp(-2*x));
+sigma_dot =1 - ReLU .* (ReLU);
+plot(x, ReLU, 'r-','MarkerSize',12);
+hold on;
+plot(x, sigma_dot, 'b-','MarkerSize',12);
+
+legend('tanh(x)','tanh''(x)');
+xlabel('x');
+ylabel('tanh(x)');
+
+set(gca, 'FontSize', 14);
+set(gcf, 'Color', 'none');
+saveas(gcf, 'C:\Users\Administrator\Desktop\thesisfigures\networks\ReLU.fig');
+export_fig C:\Users\Administrator\Desktop\thesisfigures\networks\ReLU.pdf -q101

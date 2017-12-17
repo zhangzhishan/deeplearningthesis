@@ -8,6 +8,7 @@
 \usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{subfig}
+\usepackage{stmaryrd}
 \usepackage{standalone}
 
 \usepackage{lipsum}
@@ -40,14 +41,14 @@
 \support{本文研究得到某某基金(编号:XXXXXXX)资助。}
 
 \begin{document}
-\makecover
-\frontmatter
+% \makecover
+% \frontmatter
 
 
 % 中文摘要
-\include{preface/c_abstract}
+% \include{preface/c_abstract}
 % 英文摘要
-\include{preface/e_abstract}
+% \include{preface/e_abstract}
 
 \tableofcontents
 
@@ -64,18 +65,18 @@
 \bibliographystyle{nputhesis}
 \bibliography{references/reference,references/emitter}
 
-\Appendix
-\input{appendix/appendix.tex}
+% \Appendix
+% \input{appendix/appendix.tex}
 
-% This is appendix.
+% % This is appendix.
 
-\Thanks
-\input{appendix/acknowledgements.tex}
+% \Thanks
+% \input{appendix/acknowledgements.tex}
 
-% This is a thanks.
+% % This is a thanks.
 
-\Work
-\input{appendix/work.tex}
+% \Work
+% \input{appendix/work.tex}
 
-\statement
+% \statement
 \end{document}
