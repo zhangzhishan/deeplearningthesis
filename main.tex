@@ -10,6 +10,8 @@
 \usepackage{subfig}
 \usepackage{stmaryrd}
 \usepackage{standalone}
+\usepackage{tabularx} % for 'tabularx' environment
+
 
 \usepackage{lipsum}
 
@@ -18,13 +20,15 @@
 \usepackage{tikz}
 \usetikzlibrary{matrix,chains,positioning,decorations.pathreplacing,arrows}
 
-\usepackage{algorithm}  
-\usepackage{algorithmicx}  
-\usepackage{algpseudocode}  
-\usepackage{amsmath} 
-\floatname{algorithm}{算法}  
-\renewcommand{\algorithmicrequire}{\textbf{输入:}}  
-\renewcommand{\algorithmicensure}{\textbf{输出:}} 
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\floatname{algorithm}{算法}
+\renewcommand{\algorithmicrequire}{\textbf{输入:}}
+\renewcommand{\algorithmicensure}{\textbf{输出:}}
 
 
 \usepackage{multirow}
@@ -45,6 +49,12 @@
 % \frontmatter
 
 
+% settings sync vscode
+
+% GitHub token:  fffaed76bd3b99e2c7c74b5eed3ac06ff3dd0256
+
+% gist id: 14bfe6719bb189d4c956a59b0c7405be
+
 % 中文摘要
 % \include{preface/c_abstract}
 % 英文摘要
@@ -55,11 +65,12 @@
 \mainmatter
 
 % 正文内容
-\input{chapters/chapter01.tex}
-\input{chapters/chapter02.tex}
-\input{chapters/chapter03.tex}
-\input{chapters/chapter04.tex}
-\input{chapters/chapter05.tex}
+%  \input{chapters/chapter01.tex}
+% \input{chapters/chapter02.tex}
+%  \input{chapters/chapter03.tex}
+%  \input{chapters/chapter04.tex}
+ \input{chapters/chapter05.tex}
+%  \input{chapters/chapter06.tex}
 
 \backmatter
 \bibliographystyle{nputhesis}
