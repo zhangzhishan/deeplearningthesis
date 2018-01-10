@@ -1,10 +1,7 @@
 \chapter{基于深度学习的天波超视距雷达地海杂波识别}
 \section{引言}
-% TODO: 按照英文文章重新布局
 % \textcolor{red}{该章可以添加利用二维卷积神经网络进行识别的算法实验}
 % \textcolor{red}{复合类的提取}
-
-% \textcolor{red}{该部分仍然存在问题}
 
 天波超视距雷达目标定位精度依赖于传播模式的准确识别以及坐标配准系数的精确测量。电离层传播的复杂性使得传播模式很难精确确定，而电离层探测子系统独立于主雷达工作导致其提供的坐标配准参数与主雷达量测回波存在不一致性、误差大等问题，从而造成电离层传播模式识别正确率低、目标定位精度差等。天波超视距雷达地海杂波识别是一种基于无源信标（远海区域的岛屿等陆地）获得坐标配准系数的技术。鉴于远海地区有源设备的布置面临着较大的困难，通过区分识别地海杂波、构建地海边界轮廓、与先验地理轮廓信息匹配可同样提供坐标配准修正参数，改善周围航迹目标的定位精度。受分辨率低、定位精度差、系统偏差大、电离层多模、多路径传播等因素影响，天波雷达地海杂波识别技术存在很大挑战，主要体现在以下几个方面:
 \begin{itemize}
@@ -21,10 +18,10 @@
 对于一般的进行天波雷达地海杂波识别的文章，其主要利用海杂波的Bragg特性，但是在实际情况中，受电离层条件、工作环境等的影响，会出现很多频谱很难分辨的情形，如图\ref{fig:spectrum}所示。
 \begin{figure}[H]
 	\centering
-	\subfloat[地杂波频谱]{\includegraphics[width=0.4\textwidth]{figures/othr/land}%
+	\subfloat[地杂波频谱]{\includegraphics[width=6.67cm]{figures/othr/land}%
 		\label{fig:land}}
 	\hfil
-	\subfloat[海杂波频谱]{\includegraphics[width=0.4\textwidth]{figures/othr/sea}%
+	\subfloat[海杂波频谱]{\includegraphics[width=6.67cm]{figures/othr/sea}%
 		\label{fig:sea}}
 	\caption{两幅无法轻易区分的地海杂的频谱波示意图。图 \ref{fig:land} 的Bragg峰具有小的频偏，图 \ref{fig:sea} 作为海杂波却无法容易的分辨出Bragg峰.}
 	\label{fig:spectrum}
@@ -37,17 +34,17 @@
 
 \begin{figure}[H]
 	\centering
-	\subfloat[杂波干扰严重的频谱图]{\includegraphics[width=0.4\textwidth]{figures/othr/noise}}%
+	\subfloat[杂波干扰严重的频谱图]{\includegraphics[width=6.67cm]{figures/othr/noise}}%
 	\hfil
-	\subfloat[具有较强展宽的频谱图]{\includegraphics[width=0.4\textwidth]{figures/othr/wide}}%
+	\subfloat[具有较强展宽的频谱图]{\includegraphics[width=6.67cm]{figures/othr/wide}}%
 
-	\subfloat[Bragg峰缺失频谱图]{\includegraphics[width=0.4\textwidth]{figures/othr/lost}}
+	\subfloat[Bragg峰缺失频谱图]{\includegraphics[width=6.67cm]{figures/othr/lost}}
 	\hfil
-	\subfloat[Bragg峰偏移频谱图]{\includegraphics[width=0.4\textwidth]{figures/othr/shift}}
+	\subfloat[Bragg峰偏移频谱图]{\includegraphics[width=6.67cm]{figures/othr/shift}}
 
-	\subfloat[对空工作模式频谱图]{\includegraphics[width=0.4\textwidth]{figures/othr/sky}}
+	\subfloat[对空工作模式频谱图]{\includegraphics[width=6.67cm]{figures/othr/sky}}
 	\hfil
-	\subfloat[对海工作模式频谱图]{\includegraphics[width=0.4\textwidth]{figures/othr/tosea}}
+	\subfloat[对海工作模式频谱图]{\includegraphics[width=6.67cm]{figures/othr/tosea}}
 	\caption{复杂环境下频谱图}
 	\label{fig:classical_spectrum}
 \end{figure}
@@ -64,16 +61,16 @@
 我们只选择了上述四个具有典型意义的分组的数据来进行验证，舍弃了其余类型的与他们相似的数据，例如频率变化范围为-10Hz到10Hz的具有512个相干积累点的数据，这与组B的数据基本相同。
 \begin{figure}[H]
 	\centering
-	\subfloat[组 A]{\includegraphics[width=0.4\textwidth]{figures/othr/group128}%
+	\subfloat[组 A]{\includegraphics[width=6.67cm]{figures/othr/group128}%
 		\label{fig:case128}}
 	\hfil
-	\subfloat[组 B]{\includegraphics[width=0.4\textwidth]{figures/othr/group256}%
+	\subfloat[组 B]{\includegraphics[width=6.67cm]{figures/othr/group256}%
 		\label{fig:case256}}
 
-	\subfloat[组 C]{\includegraphics[width=0.4\textwidth]{figures/othr/group512}%
+	\subfloat[组 C]{\includegraphics[width=6.67cm]{figures/othr/group512}%
 		\label{fig:case512}}
 	\hfil
-	\subfloat[组 D]{\includegraphics[width=0.4\textwidth]{figures/othr/group1024}%
+	\subfloat[组 D]{\includegraphics[width=6.67cm]{figures/othr/group1024}%
 		\label{fig:case1024}}
 	\caption{不同组数据的频谱对比示意图}
 	\label{fig:group}
@@ -86,7 +83,7 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{figures/othr/system}
+	\includegraphics[width=13.5cm]{figures/othr/system}
 	\caption{系统结构图}
 	\label{fig:system}
 \end{figure}
@@ -101,10 +98,10 @@
 
 \begin{figure}[H]
 	\centering
-	\subfloat[原始频率能量曲线]{\includegraphics[width=0.4\textwidth]{figures/othr/before_fft}%
+	\subfloat[原始频率能量曲线]{\includegraphics[width=6.67cm]{figures/othr/before_fft}%
 		\label{fig:before_fft}}
 	\hfil
-	\subfloat[经过频率平移的频率能量曲线]{\includegraphics[width=0.4\textwidth]{figures/othr/after_fft}%
+	\subfloat[经过频率平移的频率能量曲线]{\includegraphics[width=6.67cm]{figures/othr/after_fft}%
 		\label{fig:after_fft}}
 
 	\caption{频谱数据平移变换示意图}
@@ -142,28 +139,27 @@
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{figures/othr/spectrum_fusion}
+	\includegraphics[width=13.5cm]{figures/othr/spectrum_fusion}
 	\caption{数据融合示意图}
 	\label{fig:spectrum_fusion}
 \end{figure}
 
 \subsection{分类算法设计}
 深度学习体系结构中有几大网络模型，其中的卷积神经网络可以直接将整个需要分类的数据作为网络的输入，避免了传统识别算法中复杂的特征提取和数据重建过程。基于此优点，使卷积神经网络在本章所需解决的天波超视距雷达地海杂波特征识别问题中有着巨大优势。
-典型的卷积神经网络由深层结构堆叠在一起的多个不同的层组成：输入层，多组卷积和池化层，有限数量的完全连接的隐藏层，以及输出层。其中最主要的部分为卷积层，其利用输入数据中的局部结构，将整个输入空间划分成很小的隐藏单元。将各个隐藏单元的权重构建得到的卷积核作用于整个输入空间，从而得到特征向量。利用这种机制，我们不仅大大减少了参数数量同时提高了数据的平移不变性。
+本章利用深度学习中的深度卷积神经网络算法，避免了对于地海杂波的建模，也即从根本上避免了传统方法所面对的困难。如图 \ref{fig:othr_tech} 所示，其主要可分为训练和识别两个步骤：利用大量已打好标签的样本通过深度卷积神经网络进行训练；然后对于新得到的雷达频谱数据利用模型进行识别，获得当前频谱数据的识别结果。
 
-天波超视距雷达地海杂波识别技术利用深度学习中的深度卷积神经网络算法，避免了对于地海杂波的建模，也即从根本上避免了传统方法所面对的困难。如图 \ref{fig:othr_tech} 所示，其主要可分为训练和识别两个步骤：利用大量已打好标签的样本通过深度卷积神经网络进行训练；然后对于新得到的雷达频谱数据利用模型进行识别，获得当前频谱数据的识别结果。
-
-\begin{figure}[H]
+\begin{figure}[hbt]
 	\centering
-	\includegraphics[width=\textwidth]{figures/othr/othr_tech}
+	\includegraphics[width=9cm]{figures/othr/othr_tech}
 	\caption{地海杂波识别技术结构图}
 	\label{fig:othr_tech}
 \end{figure}
 
-利用深度卷积神经网络进行天波超视距雷达地海杂波识别过程的主要挑战与难点在于网络模型的设计。如图\ref{fig:fullconnect}所示，本章设计的深度卷积神经网络的结构在功能上可以分为特征提取和全连接网络这两部分，特征提取层主要通过卷积操作和池化操作从输入的频谱数据中学习出最好的卷积核以及这些卷积核的组合方式，同时每一层的输出又作为下一层的输入，每层具有多个特征向量，每个特征向量具有多个神经元，并且每个特征向量来自于一种卷积核所提取输入的一种特征；全连接网络，主要是将任何一个神经元均和上一层的任何神经元之间建立管理，通过矩阵运算得到输出结果。
-\begin{figure}[H]
+利用深度卷积神经网络进行天波超视距雷达地海杂波识别过程的主要挑战与难点在于网络模型的设计。典型的卷积神经网络由深层结构堆叠在一起的多个不同的层组成：输入层，多组卷积和池化层，有限数量的完全连接的隐层，以及输出层。
+如图\ref{fig:fullconnect}所示，本章设计的深度卷积神经网络的结构在功能上可以分为特征提取和全连接网络这两部分，特征提取层主要通过卷积操作和池化操作从输入的频谱数据中学习出最好的卷积核以及这些卷积核的组合方式，同时每一层的输出又作为下一层的输入，每层具有多个特征向量，每个特征向量具有多个神经元，并且每个特征向量来自于一种卷积核所提取输入的一种特征；全连接网络，主要是将任何一个神经元均和上一层的任何神经元之间建立管理，通过矩阵运算得到输出结果。
+\begin{figure}[hbt]
 	\centering
-	\includegraphics[width=0.7\textwidth]{figures/othr/fullconnect}
+	\includegraphics[width=6.67cm]{figures/othr/fullconnect}
 	\caption{特征提取和全连接网络}
 	\label{fig:fullconnect}
 \end{figure}
@@ -180,9 +176,9 @@
 
 步骤4：构建输出层。压平步骤3获得的特征向量，把多维的输入一维化，以此作为卷积层到全连接层的一个过渡。在第一个全连接层的基础上添加dropout 参数，然后添加第二层全连接并通过激活函数Sigmoid ，输出识别结果。
 
-\begin{figure}[H]
+\begin{figure}[hbt]
 	\centering
-	\includegraphics[width=\textwidth]{figures/othr/struct}
+	\includegraphics[width=13.5cm]{figures/othr/struct}
 	\caption{卷积神经网络结构}
 	\label{fig:struct}
 \end{figure}
@@ -204,7 +200,7 @@
 }
 训练神经网络模型。在搭建好神经网络模型后，利用训练样本对该模型做进一步训练，其基本的算法流程如下：
 
-\begin{algorithm}[H]
+\begin{algorithm}[hbt]
 	\caption{Adam 训练算法}
 	\begin{algorithmic}[1] %每行显示行号
 		\Require 训练样本$X$，样本标签$Y$，最大迭代次数$K$，步长$\varepsilon$，初始目标参数$\theta$
@@ -243,7 +239,7 @@ y_{i, j} = \sum_{m=1}^{M}\sum_{n=1}^{N}w_{m,n}\cdot y_{m,n}
 \end{equation}
 $ w_{m,n} $是$(m,n)$单元处识别结果$y_{m,n}$的权重，$M$为利用的方位上的区域单元个数，$N$为利用的径向距上的区域单元个数。
 \section{仿真验证}
-在本节中，我们利用实际数据评估了我们提出的基于深度学习的地海杂波识别算法的性能。将我们的基于CNN的算法与基于LMS\cite{turley2013high}的根据多普勒频谱进行分类的算法和基于支持向量机进行分类的算法\cite{jin2012svm}进行了对比，我们算法相对于其余两种算法在性能上的提高，证明了我们算法的可用性。
+在本节中，我们利用实际数据评估了我们提出的基于深度学习的地海杂波识别算法的性能。将我们的基于CNN的算法与基于LMS\ucite{turley2013high}的根据多普勒频谱进行分类的算法和基于支持向量机进行分类的算法\ucite{jin2012svm}进行了对比，我们算法相对于其余两种算法在性能上的提高，证明了我们算法的可用性。
 \subsection{算法实现}
 \subsubsection{基于LMS的算法}
 该方法主要基于文献\cite{turley2013high}，其基本思想是利用加权最小均方算法来求解区域的模糊度，其中区域模糊度的定义如下：
@@ -290,9 +286,9 @@ $ w_{m,n} $是$(m,n)$单元处识别结果$y_{m,n}$的权重，$M$为利用的�
 g_{C_1, C_2} = \frac{area({C_1\cap C_2})}{\max(area({C_1}), area({C_2}))}
 \end{equation}
 我们用0和1来二值化我们的区域，如图\ref{fig:binary}所示。$area(C)$表示区域$C$的面积， $g_{C_1， C_2}$表示区域$C_1$ 和 $C_2$ 的匹配度。
-\begin{figure}[H]
+\begin{figure}[hbt]
 	\centering
-	\includegraphics[height=0.25\textheight]{figures/othr/binary}
+	\includegraphics[width=6.67cm]{figures/othr/binary}
 	\caption{二值化地图}
 	\label{fig:binary}
 \end{figure}
@@ -305,26 +301,26 @@ g_{C_1, C_2} = \frac{area({C_1\cap C_2})}{\max(area({C_1}), area({C_2}))}
 	\renewcommand{\arraystretch}{1.3}
 	\caption{三种算法的识别精度对比}
 	\label{tab:methods}
-	\centering
+	\centering\sWuhao
 	\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
-		\hline
+		\toprule
 		数据集 & CNN & SVM & LMS \\
-		\hline
+		\midrule
 		组 A  & 96.97\% & 85.69\% & 81.85\% \\
 		组 B & 97.14\% & 88.57\% & 81.93\% \\
 		组 C & 99.04\% & 89.03\% & 88.57\% \\
 		组 D  & 99.69\% & 91.61\% & 90.33\% \\
-		\hline
+		\bottomrule
 	\end{tabularx}
 \end{table}
 我们选取了CNN部分识别错误的结果进行分析，如图 \ref{fig:error_result} 所示，发现该部分的数据属于特征十分不明显的内容，即使是人工判定也无法很准确的判定的结果。
 
 \begin{figure}[H]
 	\centering
-	\subfloat[地杂波被错误识别为海杂波]{\includegraphics[width=0.4\textwidth]{figures/othr/error_land}%
+	\subfloat[地杂波被错误识别为海杂波]{\includegraphics[width=6.67cm]{figures/othr/error_land}%
 		\label{fig:error_land}}
 	\hfil
-	\subfloat[海杂波被错误识别为地杂波]{\includegraphics[width=0.4\textwidth]{figures/othr/error_sea}%
+	\subfloat[海杂波被错误识别为地杂波]{\includegraphics[width=6.67cm]{figures/othr/error_sea}%
 		\label{fig:error_sea}}
 	\caption{识别错误的结果}
 	\label{fig:error_result}
@@ -335,7 +331,7 @@ g_{C_1, C_2} = \frac{area({C_1\cap C_2})}{\max(area({C_1}), area({C_2}))}
 	\renewcommand{\arraystretch}{1.3}
 	\caption{匹配度对比}
 	\label{tab:method_pair}
-	\centering
+	\centering\sWuhao
 	\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 		\toprule
 		& CNN & SVM & LMS \\
@@ -348,31 +344,37 @@ g_{C_1, C_2} = \frac{area({C_1\cap C_2})}{\max(area({C_1}), area({C_2}))}
 %TODO: \textcolor{red}{添加对于三个判断结果参数的设计}
 
 为了验证我们的深度卷积网络在迭代次数方面的影响，其不同组数据的损失函数如图\ref{fig:group_results}所示，结果表明我们的算法可以在不同的数据集组中均可以较快的收敛。虽然，对于相同的神经网络结构，第一个数据集需要最多的迭代次数才能收敛，这是因为当频率和相干累计点的比例变小时信息或者说特征也随之减少，故需要较多的迭代次数。
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.4\textwidth]{figures/othr/group_results}
-	\caption{不同数据集损失函数对比图}
-	\label{fig:group_results}
-\end{figure}
 
 图\ref{fig:sizes}展示的是在样本集大小不同的情况下，我们的算法与基准算法的平均分类准确率的对比图。由于基准方法仅使用根据先验知识得到的阈值，因此随数据集增长其识别准确度变化不大，而我们的深度卷积神经网络的算法随着数据集内样本数量的增加，准确度有着显著提升。
-\begin{figure}[H]
+
+\begin{figure}[hbt]
 	\centering
-	\includegraphics[width=0.4\textwidth]{figures/othr/sizes}
-	\caption{不同数量数据集的分类准确度对比曲线图}
-	\label{fig:sizes}
+	\begin{minipage}{7cm}
+		\includegraphics[width=6.67cm]{figures/othr/group_results}
+		\caption{不同数据集损失函数对比图}
+		\label{fig:group_results}
+	\end{minipage}
+	\hspace{10pt}
+	\begin{minipage}{7cm}
+		\includegraphics[width=6.67cm]{figures/othr/sizes}
+		\caption{不同数量数据集的分类准确度对比曲线图}
+		\label{fig:sizes}
+
+	\end{minipage}
+
 \end{figure}
 
-众所周知，卷积神经网络的参数对于最终分类识别的准确率起着重要的作用。因此，我们需要对参数的选择进行一些分析。首先，我们分析在批大小（Batch Size）和迭代次数变化时，验证集数据的分类准确度。如图\ref{fig:epoch}所示，我们可以发现识别准确度随着迭代次数的增加而增长。而当批长度变大时，收敛速度加快。
+
+众所周知，卷积神经网络的参数对于最终分类识别的准确率起着重要的作用。因此，我们需要对参数的选择进行一些分析。首先，我们分析在批长度（Batch Size）和迭代次数变化时，验证集数据的分类准确度。如图\ref{fig:epoch}所示，我们可以发现识别准确度随着迭代次数的增加而增长。而当批长度变大时，收敛速度加快。
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.4\textwidth]{figures/othr/epoch}
+	\includegraphics[width=6.67cm]{figures/othr/epoch}
 	\caption{不同批长度下，分类准确度与迭代次数曲线图}
 	\label{fig:epoch}
 \end{figure}
 
 由于在预处理阶段，本章利用了滑窗算法对输入数据进行融合处理来减少由于某一帧数据中某距离方位单元由于出现的随机噪声对于我们识别结果的影响，此处对窗长参数进行设计比较。本章主要考虑到电离层会随时间发生变化且天波雷达的采样周期较长，过长的窗长对无法及时的响应电离层的变化，影响识别准确率以及与地图的匹配度。
-为了取得一个合适的窗长，我们首先利用不同窗长平均融合后的数据进行测试，得到图 \ref{fig:window} 的结果，该结果证明了在窗长过长时候，匹配度会下降的结论，当窗长过大时匹配度会降到比窗长为1时还要低。为了进一步比较权重的变化对于识别结果的影响，我们选取公式\ref{equ:window_fusion}中的权重为$w_N=\frac{1}{2},w_k=\frac{1}{2(N-1)},k=1,2,\dots,N-1$
+为了取得一个合适的窗长，我们首先利用不同窗长平均融合后的数据进行测试，得到图 \ref{fig:window} 的结果，该结果证明了在窗长过长时候，匹配度会下降的结论，当窗长过大时匹配度会降到比窗长为1时还要低。为了进一步比较权重的变化对于识别结果的影响，我们选取\equref{equ:window_fusion}中的权重为$w_N=\frac{1}{2},w_k=\frac{1}{2(N-1)},k=1,2,\dots,N-1$
 ，得到如图\ref{fig:weighted_window}所示的结果。由于增加了主单元的权重，故其可以在窗长增加时，不会有过于明显的匹配度下降。
 
 
@@ -429,7 +431,7 @@ g_{C_1, C_2} = \frac{area({C_1\cap C_2})}{\max(area({C_1}), area({C_2}))}
 %TODO: \textcolor{red}{该部分需要添加详细的内容}
 
 上面利用大量的测试数据的识别结果以及地图匹配结果对于我们基于卷积神经网络的算法进行了验证，但是卷积神经网络方法有一个问题是其为一个黑盒操作，我们无法直观地看到其用于分类的特征。
-因此，为了在理论上对于我们算法的有效性进行分析。在本节中，我们使用基于梯度变化的可视化方法，其思想为通过计算当输入数据的某个数据点发生变化时输出梯度的变化，得到每一个数据点对于输出梯度的影响，从而得到该频谱数据热力图。我们定义频谱数据序列为$ S = \{s_1, s_2, \dots,s_n\} $，其中$n$是频谱序列中的点数，设输出概率为$p(S)$。那么，我们可以得到式\ref{equ:ps}：
+因此，为了在理论上对于我们算法的有效性进行分析。在本节中，我们使用基于梯度变化的可视化方法，其思想为通过计算当输入数据的某个数据点发生变化时输出梯度的变化，得到每一个数据点对于输出梯度的影响，从而得到该频谱数据热力图。我们定义频谱数据序列为$ S = \{s_1, s_2, \dots,s_n\} $，其中$n$是频谱序列中的点数，设输出概率为$p(S)$。那么，我们可以得到\equref{equ:ps}：
 \begin{equation}
 	p(S) = w^TS+b
 	\label{equ:ps}
@@ -440,28 +442,28 @@ g_{C_1, C_2} = \frac{area({C_1\cap C_2})}{\max(area({C_1}), area({C_2}))}
 	\label{equ:w}
 \end{equation}
 
-因此，我们以通过反向传播计算得到$ w $的方程式\ref{equ:w}。图\ref{fig:vis}显示，特征点主要集中在我们预期的数据上。
+因此，我们以通过反向传播计算得到$ w $的\equref{equ:w}。图\ref{fig:vis}显示，特征点主要集中在我们预期的数据上。
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.4\textwidth]{figures/othr/heatmap}
+	\includegraphics[width=6.67cm]{figures/othr/heatmap}
 	\caption{特征重要程度热力图}
 	\label{fig:vis}
 \end{figure}
 % \begin{figure}[H]
 % 	\centering
-% 	\includegraphics[width=0.4\textwidth]{figures/othr/heatmap.pdf}
+% 	\includegraphics[width=6.67cm]{figures/othr/heatmap.pdf}
 % 	\caption{某距离方位单元海杂波频谱数据关注度图。}
 % 	\label{fig:visfeature1D}
 % \end{figure}
 
 % \textcolor{red}{
 % 	识别结果的理论分析
-% 	图\ref{fig:visfeature1D}中红色圆圈部分表示主要利用的特征所在多普勒频率，可以很直观地看出，对于下图这样的海杂波布拉格峰附近频点的数据被关注比较多，另一方面同时兼顾了其余频点的特征，提高了识别准确率。
+% 	图\ref{fig:visfeature1D}中红色圆圈部分表示主要利用的特征所在多普勒频率，可以很直观地看出，对于图 xxx 这样的海杂波布拉格峰附近频点的数据被关注比较多，另一方面同时兼顾了其余频点的特征，提高了识别准确率。
 % }
 % 利用我们已经训练好的模型展示对于其最终判断测试结果为正或者为负主要利用的频谱特征点。
 
 \section{小结}
-在本章中，我们提出了基于卷积神经网络天波雷达地海杂波识别的新算法。其主要克服了传统的阈值识别方法或支持向量机算法根据经验从频谱数据中提取特征，导致操作复杂度高，分类精度低的缺点。同时，我们将我们的算法与传统算法和支持向量机算法进行了对比。实验结果表明，我们的方法在地海杂波识别问题上更加有效以及抗干扰性能更强，发现利用不同时间的同一区域的频谱数据进行融合可以很大程度上提高分类精度。在更高精度的识别结果的帮助下，我们可以得到更加精确的修正系数，可以为目标定位问题提供非常大的帮助。另一方面，如果我们针对于特定的问题对卷积神经网络的参数进行调整，可以进一步提高我们算法的性能。
+在本章中，我们提出了基于卷积神经网络天波雷达地海杂波识别的新算法。其主要克服了传统的阈值识别方法或支持向量机算法根据经验从频谱数据中提取特征，导致操作复杂度高，分类精度低的缺点。同时，我们将我们的算法与传统算法和支持向量机算法进行了对比，实验结果表明，我们的方法在地海杂波识别问题上更加有效以及抗干扰性能更强，发现利用不同时间的同一区域的频谱数据进行融合可以很大程度上提高分类精度。在更高精度的识别结果的帮助下，我们可以得到更加精确的修正系数，可以为目标定位问题提供非常大的帮助。另一方面，如果我们针对于特定的问题对卷积神经网络的参数进行调整，可以进一步提高我们算法的性能。
 
 % 综上所述，我们这里的创新点有以下两个方面：第一个是我们提出了一种使用深度卷积神经网络方法利用频谱数据进行地海杂波分类的方法，克服了传统算法的挑战；另一方面，我们利用实际数据进行验证
 

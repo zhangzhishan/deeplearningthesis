@@ -26,68 +26,92 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathrsfs}
+\usepackage{ulem}
+\usepackage{bm}
 \floatname{algorithm}{算法}
 \renewcommand{\algorithmicrequire}{\textbf{输入:}}
 \renewcommand{\algorithmicensure}{\textbf{输出:}}
+% 增加 \ucite 命令使显示的引用为上标形式
+% \newcommand{\ucite}[1]{$^{\mbox{\scriptsize \cite{#1}}}$}
+% \newcommand{\upcite}[1]{\textsuperscript{\textsuperscript{\cite{#1}}}}
+\newcommand{\ucite}[1]{{\textsuperscript{\cite{#1}}}}
+\newcommand{\sWuhao}{\fontsize{10.5pt}{10.5pt}\selectfont}      % 五号, 单倍
+\newcommand\equref[1]{公式(\ref{#1})}
+
+% \def\final{0} % 1--明评，0--盲屏
 
 
 \usepackage{multirow}
 \schoolno{10699}
 \classno{TP27}
 %\secretlevel{}
-%\title{\LaTeX 论文模板之模板模板模板}
 \title[A Research on Radar Signal Classification using Deep Learning Based Techniques]{基于深度学习的雷达信号分类算法研究}
-\author[Zhishan Zhang]{张治山}
-\authorno{2015201518}
-\major[Math]{控制理论与控制工程}
-\supervisor[Pan Quan]{潘泉}
 \applydate[March 2018]{2018~年~3~月}
 \support{本文研究得到某某基金(编号:XXXXXXX)资助。}
 
 \begin{document}
-% \makecover
-% \frontmatter
+\ifx\final\undefined
 
+\else
+    \if\final1
+        \author[Zhang Zhishan]{张治山}
+        \authorno{2015201518}
+        \major[Control Theory and Control Engineering]{控制理论与控制工程}
+        \supervisor[Pan Quan]{潘泉}
+    \else
+        \author[\hspace{20 mm}]{\hspace{20 mm}}
+        \authorno{\hspace{20 mm}}
+        \major[\hspace{20 mm}]{\hspace{20 mm}}
+        \supervisor[\hspace{20 mm}]{\hspace{20 mm}}
+    \fi
 
-% settings sync vscode
+    \makecover
+    \frontmatter
+    % 中文摘要
+    \include{preface/c_abstract}
+    % 英文摘要
+    \include{preface/e_abstract}
 
-% GitHub token:  fffaed76bd3b99e2c7c74b5eed3ac06ff3dd0256
+    \tableofcontents
 
-% gist id: 14bfe6719bb189d4c956a59b0c7405be
-
-% 中文摘要
-% \include{preface/c_abstract}
-% 英文摘要
-% \include{preface/e_abstract}
-
-\tableofcontents
-
-\mainmatter
-
+    \mainmatter
+\fi
 % 正文内容
-%  \input{chapters/chapter01.tex}
-% \input{chapters/chapter02.tex}
-%  \input{chapters/chapter03.tex}
-%  \input{chapters/chapter04.tex}
- \input{chapters/chapter05.tex}
-%  \input{chapters/chapter06.tex}
+\input{chapters/chapter01.tex}
+\input{chapters/chapter02.tex}
+\input{chapters/chapter03.tex}
+\input{chapters/chapter04.tex}
+\input{chapters/chapter05.tex}
+\input{chapters/chapter06.tex}
 
 \backmatter
+
 \bibliographystyle{nputhesis}
 \bibliography{references/reference,references/emitter}
 
 % \Appendix
 % \input{appendix/appendix.tex}
+\ifx\final\undefined
 
-% % This is appendix.
+\else
+    \Thanks
 
-% \Thanks
-% \input{appendix/acknowledgements.tex}
+    \if\final1
+        \input{appendix/thanks.tex}
+    \else
+        \input{appendix/thanks_no_name.tex}
+    \fi
 
-% % This is a thanks.
+    \Work
+    \input{appendix/work.tex}
+    \statement
 
-% \Work
-% \input{appendix/work.tex}
-
-% \statement
+\fi
 \end{document}
+
+
+% “盲评格式”。
+% 	在题名页（俗称内封面）中删除作者和导师姓名
+% 	在“攻读博士学位期间发表的学术论文和参加科研情况”中删除作者和导师姓名
+% 	在“致谢”中删除作者和导师姓名
+% 	在“学位论文知识产权声明书、学位论文原创性声明”上不署名
