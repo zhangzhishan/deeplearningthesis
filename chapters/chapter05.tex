@@ -1,280 +1,434 @@
-% 实验：
+\chapter{基于深度学习的辐射源识别}
+\label{sec:sei}
+% TODO:增加内容与仿真！！！
+% 对比利用不同的，添加具体参数的设置。
 
-\chapter{基于深度嵌入卷积聚类方法的地海杂波无监督分类}
+
+% 可以考虑进行未经过模糊函数处理和处理之后的对比
+
+% 不同卷积核  学习率  不同卷积核个数
+% 层数 节点数等
+% 不同训练方法
+% 多类别的分类结果图可以参考
+% 不同数据的各自的图
+
 \section{引言}
-聚类方法如今已经在各个领域的到了广泛应用，但是传统的聚类算法的性能受到数据维数以及数据量的影响，会产生维数灾难的问题。
-对于数据集规模较大的情形，有一些研究只选择数据集的一个子集来加速聚类过程\ucite{shinnou2008spectral}。
-为了解决计算复杂度的问题，以往的研究往往首先将高维度的数据映射到低维，然后将嵌入数据聚类到这个新的子空间中\ucite{roth2004feature}。
-这类算法可以分为两个阶段：特征学习和聚类，其基本思路是向目标函数中添加表征稀疏性或者是图形约束的先验知识进行训练学习\ucite{tian2014learning}。
+辐射源识别算法需要在无法收集大量数据的前提下正确的对于目标进行分类同时准确区分出已知目标和未知目。
+与传统利用已知类别的样本进行训练测试的机器学习算法不同，本站的问题是在Open Set的背景下，需要考虑输入未知分类样本的情况。
+由于在复杂电磁环境下传统的辐射源个体识别面临识别能力差和无法识别未知目标等问题与挑战，因此需要寻找一种新的方法解决该问题。
 
-特征学习指的是一类试图利用一组通常稀疏的基本向量或特征来描述一个数据集的学习方法。
-在实践中，有很多不同的算法可以进行特征学习，包括自编码器（Auto-Encoder， AE）、K-均值聚类（K-Means）、高斯混合模型（Gaussian Mixture Model， GMM）和受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）。
-这些方法都倾向于学习一个近似局部滤波器字典\ucite{coates2011analysis}，例如用于自然图像的Gabor类边缘滤波器，或者用于MNIST数字数据集的书写笔划。
-% 虽然RBM是可以从数据生成分布中抽样的生成模型\ucite{hinton2010practical}，但是自编码器被训练来优化它们对输入数据的重构。
+本章综合雷达信号处理、深度学习等多学科理论，通过对实际数据的分析，结合深度卷积神经网络与支持向量机方法，以雷达信号的模糊函数切片作为训练样本的特征向量，构建了一个可以对未知分类进行辨识的分类器。最后，利用实际数据进行验证，证明本章提出的分类器具有很高的准确性。
 
-后来，文献\cite{xie2016unsupervised}提出了共同完成特征学习和聚类的算法，深度嵌入聚类算法（Deep Embedding Clustering， DEC）。该算法以自学习的方式定义了一个有效的目标函数。定义的聚类损失函数用于同时更新网络和聚类中心的变换参数。
-但是，深度嵌入聚类算法中使用最广泛的神经网络是堆栈自编码器。
-堆栈自编码器需要逐层预训练，然后以端到端(end-to-end)的方式进行微调。
-当层次更深时，预训练过程是十分耗时的。此外，堆栈自编码器是建立在全连接的层次上，对于处理局部信息是无效的。
-% 本章通过考虑数据生成分布的局部结构并结合卷积层来改进DEC算法。
+本章安排如下： \ref{sec:sei_data}节对辐射源信号进行了分析，并对其进行预处理，求取其模糊函数切片，\ref{sec:sei_method}节构建了本章的Open Set 分类器，详细地阐述了深度卷积神经网络这个主分类器与支持向量机Meta-Recognition的设计过程，\ref{sec:sei_experiment}节利用实际数据对于分类器已知分类识别和未知分类辨别的性能进行了验证，\ref{sec:sei_summary}节进行本章总结。
 
-本章安排如下： 5.2节对卷积自编码网络进行了介绍，5.3节构建了本章利用的深度嵌入卷积聚类器，通过利用卷积自编码器对输入地海杂波进行重构，然后利用本章提出的聚类损失函数进行训练，最终获得聚类结果，5.4节利用实际数据对于本章提出的算法性能进行了分析讨论，5.5节进行本章总结。
-
-\section{卷积自编码网络}
-\subsection{自编码器}
-
-自编码器是一种利用隐层用来重构输入的神经网络。其模型如图\ref{fig:ae}所示，它由编码器（Encoder）和解码器(Decoder)两部分组成，本质上是对输入信号的某种变换。
-\begin{figure}[hbt]
-	\centering
-	\includegraphics[width=9cm]{figures/AE/ae}
-	\caption{自编码器模型}
-	\label{fig:ae}
-\end{figure}
-对于一组具有$N$个输入向量的给定输入数据集，
-编码器将第$i$个输入信号$x^{(i)}\in\mathbb{R}^{d_x}$编码到某个隐层的表示$h^{(j)}\in\mathbb{R}^{d_h}$，$d_x$和$d_h$分别为输入表示和隐层表示的维数，然后解码器再将$h^{(j)}$解码为输出$x'^{(i)}\in\mathbb{R}^{d_x}$。通过最小化$x^{(i)}$与$x'^{(i)}$之间的差距，可以训练得到一个用来重构输入特征的映射。
-
-编码和解码公式如下：
-\begin{align}
-	h^{(j)}_n &= f(b_n+\sum_{m=1}^{d_x}w_{mn}x^{(i)}_m) \\
-	x'^{(i)}_m &= f(b'_m+\sum_{n=1}^{d_h}w'_{mn}h^{(j)}_n)
-\end{align}
-其中，$f$是激活函数函数，${W}=[w_{mn}]$和${W}'=[w'_{mn}]$分别为编码器和解码器的权重矩阵，${b}=[b_n]$和${b'}=[b'_m]$分别为编码器和解码器的偏置向量。
-
-在此基础上，国内外广大学者对自编码器进行了各种改进，提出了可以学习输入空间中扰动不变的特征的压缩自编码器\cite{rifai2011contractive}、
-利用高效的变分方法进行训练和生成推理的变分自编码器\cite{kingma2013auto}
-以及可以基于连续的数据流在运行中添加或合并隐层单元的在线增量自编码器 \cite{zhou2012online}。
-
-\subsection{卷积自编码器}
-传统的自编码网络只有一个隐层，只能学习出一种特征变化，于是Bengio\cite{bengio2007greedy}等人在2007年的仿照stacked RBM构成的DBN，提出堆栈自编码器（Stacked Auto-Encoder, SAE），为非监督学习在深度网络的应用又增加了一种重要的思路方法。
-堆栈自编码器的基本模型可以参看图\ref{fig:sae}，其通过逐层非监督学习的预训练，也即逐层初始化（Layer-wise Pre-training），来初始化深度网络的参数，替代传统的随机初始化的方法。预训练完毕后，利用训练参数，再进行监督学习训练。
-
-\begin{figure}
-	\centering
-	\includegraphics[width=9cm]{figures/AE/sae}
-	\caption{堆栈自编码器模型}
-	\label{fig:sae}
-\end{figure}
-
-全连接自编码器和深度自编码器都忽略了数据的局部结构信息。
-这在处理实际大小的输入时不仅是一个问题，而且在参数中引入冗余，迫使每个特征是全局的。
-然而，在视觉和对象识别领域最成功的模型\cite{lowe1999object}均主要利用了在整个输入空间发生重复的局部特征。
-基于此，文献\cite{masci2011stacked}提出了一种卷积自编码器(Convolutional Auto-Encoders, CAE)。
-卷积自编码器不同于传统的自编码器，它们的权重在输入向量中的所有位置之间共享，从而可以保持空间局部性。
-因此重构结果是隐层局部特征的线性组合。
-从结构的角度看，CAE类似于SAE，但是将SAE中的全连接神经网络变为了卷积神经网络。
-参考第二章\equref{equ:shared_weight}，对于输入$x$，第$k$个特征映射的隐层表示由\equref{equ:cae1}给出：
+\section{辐射源信号分析}
+\label{sec:sei_data}
+对辐射源信号的分析处理，本章主要考虑两方面：信号预处理、特征提取优化。
+本章所获得的信号为雷达辐射源的I/Q两路数据，这是一种在雷达信号处理领域常见的用来描述信号的方法。其中I表示In-Phase，即同相；Q表示Quadrature，即正交，与I相位之差为90度。
+设需要表示的信号的峰值幅度为$A$、相位角为$\phi$，则有：
 \begin{equation}
-	h^k=f(x*W^k+b^k)
-	\label{equ:cae1}
+	I = A\cos{\phi}
+	\label{equ:i}
 \end{equation}
-其中$b^k$是全局共享的偏置，$f$是激活函数，$*$表示卷积操作。
-因为我们希望每个滤波器专注于整个输入空间的特征，另一方面如果每个数据点一个偏置将引入太多的自由度，所以对每一个隐层使用相同的偏置。
-% https://pgaleone.eu/neural-networks/2016/11/24/convolutional-autoencoders/
-\equref{equ:cae1}生成的隐层表示是输入$x$在低维空间中的编码，
-由于我们的目标是从所生成的特征映射重构输入$x$，因此我们需要能够执行此操作的解码操作。卷积自编码器是完全卷积网络，因此解码操作也是一个卷积操作，一般称为反卷积操作(Deconvolution)或者转置卷积(Transposed Convolution)。
-
-% 另一方面，卷积减少了输出的空间范围，因此不可能使用卷积来重构具有相同空间范围的输入空间。
-% 我们可以使用输入填充来解决这个问题。如果用零填充输入$x$，则第一卷积的结果可以具有比$x$更大的空间范围，因此第二卷积可以产生具有$x$的原始空间范围的体积。
-
-% 因此，我们想要填充输入的零的数量是这样的：
-
-% \begin{equation}
-% 	dim(x)=dim(decode(encode(x)))
-% \end{equation}
-
-隐层表示$h^k$被用来作为解码器的输入，为了使得解码器的输出和原始的输入数据具有相同的结构，解码器反卷积的超参数由编码器的结构确定，
-因此，解码器的重构过程的计算公式为：
 \begin{equation}
-	x'^k=f(\sum_{k \in H}h^k * \tilde{W}^k + b'^k)
-	\label{equ:cae2}
+	Q = A\sin{\phi}
+	\label{equ:q}
 \end{equation}
-同样的，对于每一个输入通道只有一个偏置$b'^k$，$H$表示所有特征图的集合。
-$\tilde{W}$ 表示在两个维度上进行翻转操作后的权重。
-% \equref{equ:cae1}和\equref{equ:cae2}中的2D卷积操作由上下文决定。
-% 一个$m\times m$矩阵和一个$n\times n$矩阵的卷积结果可能是$(m+n− 1) \times (m + n − 1)$(full convolution)也可能是$(m − n + 1) \times  (m − n + 1)$(valid convolution)。
+也即，可以利用\equref{equ:signal}表示信号：
+\begin{equation}
+	Ae^{i\phi}=A(\cos(\phi) + i\sin(\phi))=I+Qi
+	\label{equ:signal}
+\end{equation}
+从而可以根据\equref{equ:i}和\equref{equ:q}利用I/Q数据求取信号的峰值幅度和相位角：
+\begin{equation}
+	A=\sqrt{I^2+Q^2}
+\end{equation}
+\begin{equation}
+	\phi=tan^{-1}(Q/I)
+\end{equation}
+在完成信号形式的转换后，首先需要对信号进行初步的预处理，剔除无用和错误的数据。
+在特征提取优化方面，合理的特征是分类识别的基础。由于存在相同型号的辐射源，利用简单的参数特征无法很好的完成辐射源的个体识别，但是在实际中辐射源自身存在相位噪声以及各类杂散输出，此部分特征可以用来区分出型号、参数均相同的辐射源，因此需要选取一种可以提取雷达辐射源这种无意调制产生的信号脉内细微特征的方法。
+模糊函数不仅能描述辐射源信号的分辨特性与模糊度，还能描述由雷达辐射源信号所决定的测量精度、杂波抑制特性等，通过模糊函数在时延和频偏这两个维度上的变换，可以多角度的刻画出无意调制对于发射信号的影响，最终选取了利用雷达模糊函数挖掘辐射源的特征。
+\subsection{模糊函数}
+对于信号$x(t)$，其瞬时自相关函数为$R_x(t,\tau)=x(t+\tau/2)x^{*}(t-\tau/2)$，其中$\tau$为时延，模糊函数的定义为，
+\begin{equation}
+A(\tau,\nu) = \int_{-\infty}^{+\infty}R_x(t,\tau)e^{j2\pi\nu t}dt
+\label{equ:defineaf}
+\end{equation}
+即$R_x(t,\tau)$关于时间$t$的傅里叶反变换。
 
-正如第二章介绍，一般的分层网络特别是卷积神经网络，通常引入池化层层来获得平移不变性。因此本章的卷积自编码器在编码器阶段添加了池化层，相应的在解码器阶段需要添加上采样来进行处理，如图\ref{fig:unpool}所示。
+为了方便在数字信号中使用，\equref{equ:defineaf}可以经过变换等价于下面的形式：
+\begin{equation}
+A(\tau,\nu) = \int_{0}^{\tau}x(t)x^{*}(t+\tau)e^{j2\pi\nu t}dt
+\label{equ:afcon}
+\end{equation}
+对信号均匀采样，即对接收信号和参考信号离散化后，\equref{equ:afcon}可以表示为：
+\begin{equation}
+A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{N}}
+\end{equation}
+其中，$\tau_l=l/f_s$、$\nu_m=mf_s/N$。
+
+此处以一个简单的单载频矩形脉冲信号来展示模糊函数特征提取的作用，图\ref{fig:danpinmaichong}为模糊函数图，可以发现模糊函数存在一定的冗余，其主要变化均处于0时偏和0频偏附近。
+为了减小计算量，本章在频偏为0附近取不同时间延迟的切片作为信号特征，即可以有效地提取信号的相位噪声和杂散输出等个体特征，并且此处受噪声的干扰较小，更加稳定，图 \ref{fig:qiepian}即为在频偏为0处的单载频矩形脉冲信号模糊函数切片。
 
 \begin{figure}[hbt]
 	\centering
-	\includegraphics[width=13.5cm]{figures/AE/unpool}
-	\caption{上采样示意图}
-	\label{fig:unpool}
+	\begin{minipage}[b][][b]{7cm}
+		\centering
+		\includegraphics[width=6.67cm]{figures/emitter/danpinmaichong}
+		\caption{单载频矩形脉冲信号模糊函数图}
+		\label{fig:danpinmaichong}
+	\end{minipage}
+	\hspace{10pt}
+	\begin{minipage}[b][][b]{7cm}
+		\centering
+		\includegraphics[width=6.67cm]{figures/emitter/qiepian}
+		\caption{单载频矩形脉冲信号模糊函数切片}
+		\label{fig:qiepian}
+	\end{minipage}
+
 \end{figure}
 
-模型参数$\Theta=\{{W},{b},{b'}\}$通过最小化其损失函数进行求取，一般利用均方误差损失函数(mean squared error, mse)：
-\begin{align}
-	\mathscr{L} &= \frac{1}{N}\sum_{i=1}^N||x_i-x_i'||_2^2 \label{equ:mse_loss}\\
-	\theta^* &= arg\min\limits_{\theta} \mathscr{L}  \label{equ:mse}
-\end{align}
-就像标准的神经网络一样，反向传播算法被用来计算相对于参数的误差函数的梯度,则可以得到：
-\begin{equation}
-	\frac{\partial \mathscr{L}}{\partial W^k}=x * \Delta h ^k+\tilde{h}^k * \Delta x'
-\end{equation}
-$\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然后可以使用随机梯度下降（SGD）等基于梯度的优化算法来更新权重。
+\section{Open Set 分类器设计}
+\label{sec:sei_method}
+通常的识别或者分类系统仅考虑的是一个闭集分类系统，然而在现实世界中，这种分类系统会遇到很大的问题。由于其最基本的假设是所有的类别均为先验已知，那么就会出现问题，例如在训练样本中不存在类别的样本就会被错误的分到某个类别中去。这种在训练过程提供不完整的信息，而在测试时添加未知分类的问题，称作Open Set识别\ucite{scheirer2013toward, jain2014multi}。这个问题还可以描述为需要在测试过程中拒绝未知样本。Open Set目标识别系统必须可以准确的处理下面三种类型的数据类：
+\begin{itemize}
+	\item 已知的（目标）类，被标记为正训练样本的数据。
+	\item 已知的未知（非目标）类，被标记为负训练样本的数据。
+	\item 未知的未知（非目标）类，在训练样本中不存在的类别的数据。
+\end{itemize}
+传统的机器学习算法均是针对闭集数据设计的，随着识别算法应用场景的增多和对精度要求的提高，许多学者开始了对Open Set识别的研究。Simonson\ucite{simonson1998probabilistic}提出了一种称作概率融合(probabilistic fusion, PF)的利用统计的方法来进行Open Set识别，其主要通过合并来自不同数据源的证据得到一个统计测试模型，根据此模型的分布来对于类别进行判断。Scheirer等人\ucite{scheirer2011meta}提出了一种通过分析后验数据得分来进行类型判断的方法。
 
-本节介绍了一种用于分层特征提取的无监督方法,卷积自编码器。相比于传统自编码器，其更有利于学习数据的局部结构，避免特征空间的失真。
-虽然卷积自编码器的过完备隐层表示使得其学习比标准自编码器更难，但是可以通过添加池化层加强其稀疏性来在一定程度上降低计算量。
-% 而不需要通过反复试验来设置正则化参数。
-
-\section{深度嵌入卷积聚类方法}
-深层嵌入式聚类（Deep Embedding Clustering, DEC）\cite{xie2016unsupervised}算法提供了一种无监督的方式学习特征表示和聚类的思路，通过联合优化神经网络和聚类中心提高了聚类算法的性能和鲁棒性。但是，该算法由于利用了堆栈自编码器，无法利用数据的局部特征信息，
-因此本章在此基础上利用卷积自编码器代替传统的堆栈自编码器，提出了深度嵌入卷积聚类方法(Deep Embedding Convolution Clustering, DECC)。
-
-\subsection{深度嵌入卷积聚类方法结构}
-首先对于问题进行描述，假设需要将$N$个样本$X=[x_1,\dots,x_N]$聚为$K$个类别，其聚类中心点为$\mu_1,\dots,\mu_K$，其中每一个样本$x_i\in \mathbb{R}^{d_x}$，由于对于维数较大的样本会产生维数灾难的问题，因此需要引入一个嵌入函数$\varphi_W: X \rightarrow Z$，可以将原始样本映射到嵌入子空间$Z=[z_1,\dots,z_N]$，其中$z_i\in \mathbb{R}^{d_z}$的维数远小于原始样本的维数，也即$d_z<<d_x$。
-然后，利用K-均值聚类算法，将子空间$Z$进行聚类，得到初始聚类中心${\mu_k}$。
-
-本章利用卷积自编码器作为嵌入函数对原始样本进行降维，其基本结构如图 \ref{fig:cae} 所示。
-通过三次卷积操作充分提取输入样本的特征，我们在所有层上均利用ReLU激活函数，并且在编码器后以相反的顺序放置解码器，由于编码器为卷积操作，故解码器为反卷积。在编码器与解码器中间添加嵌入层（图\ref{fig:cae}中绿色标记的全连接层），该层的结果被用于进行聚类操作。DECC的结构如图 \ref{fig:decc} 所示。
+此部分主要解决的问题是当得到一个新的测试样本，如果该样本不属于已经经过训练的分类，那么传统的神经网络模型会将该样本指派给与其最相似的一个类别，此种情况对一个Open Set识别系统，也即类似于辐射源识别系统这种具有较多尚未经过训练的样本的一个数据集，首先这会导致其识别率下降，另一方面是由于对未知辐射源无法很好的确定，无法很好的完成预警等任务。
+目前，学者对该问题的研究主要分为下面两个思路：
+\begin{itemize}
+	\item 在训练集中添加一个“未知”类别，利用不同的来自非已知类别的数据作为训练样本对该类别进行训练，然后对于所有的输入数据进行类别的识别，对于识别结果为该类别的数据作为未知分类。
+	\item 针对多分类使用的softmax函数，可以设立阈值或者对该识别结果进行一个评价（例如与已知类别数据的一个“距离”），通过这种方式分辨出未知分类。
+\end{itemize}
+第一个思路最大的问题是实际工程中无法得到所有可能的未知类别的样本来进行训练，具有一定的局限性，不适用于本章这个具有大量来自未知分类数据的问题。针对于该问题，本章基于后一个思路设计了一个基于Meta-Recognition的可以识别未知辐射源的深度神经网络。首先是创建一个深度卷积神经网络分类器，该分类器的输出为该训练样本属于各个类别的概率，然后将此类别作为一个输入，输入到一个支持向量机分类器Meta-Recognition中，然后利用该Meta-Recognition判断输入是否为未知分类。
 \begin{figure}[hbt]
 	\centering
-	\includegraphics[width=13.5cm]{figures/AE/cae}
-	\caption{卷积自编码器结构图}
-	\label{fig:cae}
+	\includegraphics[width=13.5cm]{figures/emitter/frame_emitter}
+	\caption{分类器设计结构图}
 \end{figure}
+
+\subsection{深度卷积神经网络分类器设计}
+本章根据辐射源信号的实际数据以及其反映出来的特性，设计了一个如图\ref{fig:struct_emitter}所示具有10层的一维卷积神经网络。
+该分类器作为主分类器，且Meta-Recognition是以该分类器的输出作为输入，所以该分类器性能的好坏会直接影响到对已知类别的分类和对未知类别的判断。
+
+第一层是输入层，由于模糊函数切片为一个$1 \times 1000$的向量，因此输入层大小是$1 \times 1000$。
+
+第二层是卷积层$C1$，$C1$对输入向量进行一维卷积运算提取特征，卷积运算可以最
+大程度的提取原始信号的特征。此处利用了256个大小为$1\times 3$的卷积滤波器，其窗口移动步长为1。
+
+第三层是一个池化层$S2$，$S2$层对上一层$C1$做池化处理，池化的目
+的是在保留数据有用信息的同时，尽可能减少数据量。此处采用的是$1\times 2$的最大池化操作。
+
+第四层是一个卷积层 $C3$，$C3$对$S2$的特征进行卷积操作，此处利用了128个大小为$1\times 3$的卷积滤波器。
+
+第五层是一个卷积层 $C4$，其结构与$C3$相同，128个大小为$1\times 3$的卷积滤波器。
+
+第六层是一个池化层 $S5$，其结构与$S2$相同，$1\times 2$的最大池化操作。
+
+第七层是一个卷积层 $C6$，其结构与$C3$相同，128个大小为$1\times 3$的卷积滤波器。
+
+第八层是一个卷积层 $C7$，其结构与$C3$相同，128个大小为$1\times 3$的卷积滤波器。
+
+第九层是一个池化层 $S8$，其结构与$S2$相同，$1\times 2$的最大池化操作。
+
+第十层是输出层，根据不同的类别个数选取相应的输出节点个数，首先将$S8$的特征拉成一个一维向量，然后通过全连接网络与输出层进行连接，通过Softmax激活函数输出最终的结果。
 
 \begin{figure}[hbt]
 	\centering
-	\includegraphics[width=13.5cm]{figures/AE/decc}
-	\caption{深度嵌入卷积自编码器结构图}
-	\label{fig:decc}
+	\includegraphics[width=13.5cm]{figures/emitter/struct_emitter}
+	\caption{深度卷积神经网络框架图}
+	\label{fig:struct_emitter}
 \end{figure}
 
-\subsection{KL散度聚类方法}
-文献\cite{maaten2008visualizing}利用学生t分布来衡量嵌入点$z_i$与聚类中心点$\mu_k$的相似度：
-\begin{equation}
-	p_{ik}=\frac{(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}}{\sum_{k'}(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}}
-	\label{equ:p}
-\end{equation}
-其中，$\alpha$为学生t分布的自由度，$p_{ik}$可以看作样本$i$到类别$k$的概率。
+\subsection{支持向量机 Meta-Recognition 设计}
 
-为了定义我们的聚类目标函数，我们使用辅助目标变量(auxiliary target variable)$Q$来迭代地改进模型预测。为此，我们首先使用Kullback-Leibler（KL）散度来减小模型预测$P$和目标分布$Q$之间的距离。
-\begin{equation}
-	\mathscr{L}_{kld}=KL(Q||P)=\frac{1}{N}\sum_{i=1}^{N}\sum_{k=1}^{K}q_{ik}\log{\frac{q_{ik}}{p_{ik}}}
-	\label{equ:kldfirst}
-\end{equation}
-根据文献\cite{xie2016unsupervised}，目标分布$Q$的定义如下：
-\begin{equation}
-	q_{ik}=\frac{p_{ik}^2/f_k}{\sum_k(p_{ik}^2/f_k)}
-	\label{equ:traget_distribution}
-\end{equation}
-其中$f_k$的定义为
-\begin{equation}
-	f_k=\sum_iq_{ik}
-\end{equation}
+\subsubsection{支持向量机原理}
+支持向量机是一种流行的分类方法，它可以在不需要大量数据的情况下产生良好的结果。对一个二分类问题，设$((x_1,y_1),\dots,(x_n,y_n))$为训练数据集，其中$x_i$为某样本的特征向量，$y_i\in\{-1,+1\}$为该样本的标签。支持向量机的思想为找到一个超平面将这些样本划分为正类（标签为$+1$）和负类（标签为$-1$），并且使得正类和负类之间的距离最大。这个超平面的间隔被定义为正类与负类之间的最近距离。
 
-\equref{equ:mse}给出了自编码器重构的损失函数，故最终的损失函数为：
+对于一个线性分类问题，假设所有的数据满足下面的约束：
 \begin{equation}
-	\mathscr{L}=\mathscr{L}_{mse}+\beta \mathscr{L}_{kld}
-	\label{equ:l_last}
+	w\cdot x_i +b \geq + 1 \quad y_i = +1
+	\label{equ:constraint1}
 \end{equation}
-其中，$\beta > 0$为调节两部分损失函数的权重。
-
-\subsection{学习算法}
-对于\equref{equ:l_last}中的损失函数，我们利用随机梯度下降和反向传播进行学习。根据上一节的描述可知，总共有三类参数需要学习：卷积自编码器的权重、聚类中心以及目标分布$Q$。
-\subsubsection{更新卷积自编码器的权重和聚类中心}
-对于一个给定的目标分布$Q$，那么聚类损失$\mathscr{L}_{kld}$相对于嵌入点$z_i$和聚类中心点$\mu_k$的梯度计算公式如下：
-\begin{align}
-	\frac{\partial \mathscr{L}_{kld}}{\partial z_i} &= 2\sum_{k=1}^K(1+||z_i-\mu_k||^2)^{-1}(q_{ik}-p_{ik})(z_i-\mu_k) \\
-	\frac{\partial \mathscr{L}_{kld}}{\partial \mu_k} &= 2\sum_{i=1}^N(1+||z_i-\mu_k||^2)^{-1}(p_{ik}-q_{ik})(z_i-\mu_k) \\
-\end{align}
-那么对于一个小的批次$m$和学习率$\lambda$，$\mu_k$的更新公式为：
 \begin{equation}
-	\mu_k=\mu_k-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{kld}}{\partial \mu_k}}
+	w\cdot x_i +b \leq + 1 \quad y_i = -1
+	\label{equ:constraint2}
 \end{equation}
-编码器的权重更新公式为：
+其中$w$为超平面的法向量，$\frac{|b|}{||w||}$是从超平面到原点的垂直距离，$||w||$是向量$w$的欧拉范数。将上述两个式子合并得到：
 \begin{equation}
-	W=W-\frac{\lambda}{m}\sum_{i=1}^m(\frac{\partial \mathscr{L}_{mse}}{\partial W} + \beta \frac{\partial \mathscr{L}_{kld}}{\partial W})
-	\label{equ:encoder_update}
+	y_i(w\cdot x_i+b)\geq 1 \forall i
+	\label{equ:svm}
 \end{equation}
-解码器的权重更新公式为：
+\equref{equ:svm} 中的训练样本构成了这个分类平面（图 \ref{fig:hyperplanes} 中的$H_1$与$H_2$）。间隔 $\rho$ 可以通过计算$H_1$与$H_2$的距离得到：
 \begin{equation}
-	W'=W'-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{mse}}{\partial W'}}
+	\rho=\frac{|1-b|}{||w||}-\frac{|-1-b|}{||w||}=\frac{2}{||w||}
 \end{equation}
-
-\subsubsection{更新目标分布}
-根据\equref{equ:traget_distribution}可知，目标分布$Q$依赖于先验的软指派(soft assignment)$P$。因此，为了提升结果的鲁棒性，本章利用所有的嵌入点每隔$T$次迭代对目标分布进行更新，其更新主要利用\equref{equ:p}和\equref{equ:traget_distribution}。并且每次完成更新后，重新计算样本$x_i$的指派：
-\begin{equation}
-	s_i=arg \max \limits_k p_{ik}
-	\label{equ:assign}
-\end{equation}
-当相邻两次更新的指派变化小于一个阈值$\delta$时，停止迭代，那么则可以得到整个算法流程图。
-
-\begin{algorithm}[H]
-	\caption{DECC 算法学习过程}
-	\begin{algorithmic}[1] %每行显示行号
-		\Require 训练样本$X$，聚类结果个数$K$，最大迭代次数$iter_{max}$，目标分布更新间隔$T$，初始目标参数$\theta$，学习率$\eta$
-		\Ensure 卷积自编码器编码器的权重$W$和解码器的权重$W'$，聚类中心$\mu$，指派标签$s$
-		\State 初始化迭代次数$iter=1$
-		\State 只利用重构损失函数对卷积自编码器进行训练，获得初始权重$W$和$W'$
-		\State 利用K-均值聚类算法获得初始聚类中心$\mu$
-		\While{$iter < iter_{max}$}
-			\If{iter mod T = 0}
-				\State 计算所有的所有的嵌入点 $z_i=\varphi_W(x_i),i=1,\dots,N$
-				\State 将\equref{equ:p}代入\equref{equ:traget_distribution}更新目标分布 $Q$
-				\State 保存上一次指派$s_{last}=s$
-				\State 计算新的指派 $s_i=arg \max \limits_k p_{ik}, i= 1,\dots,N$
-				\If{$sum(s_{last} \neq s) / N < \delta $}
-					\State 停止学习
-				\EndIf
-			\EndIf
-			\State 从训练集中获取$m$ 个采样样本 $\{x^{(1)},\dots,x^{(m)}\}$ ，其中$m$ 为批处理中一批样本的个数。
-			\State 更新聚类中心$\mu_k=\mu_k-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{kld}}{\partial \mu_k}}$
-			\State 更新编码器权重 $W=W-\frac{\lambda}{m}\sum_{i=1}^m(\frac{\partial \mathscr{L}_{mse}}{\partial W} + \beta \frac{\partial \mathscr{L}_{kld}}{\partial W})$
-			\State 更新解码器权重 $W'=W'-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{mse}}{\partial W'}}$
-		\EndWhile
-	\end{algorithmic}
-\end{algorithm}
-
-
-\section{仿真验证}
-
-% \subsection{算法设置}
-本章利用第三章中组C的训练数据用于本章的实验，考虑到地海杂波在时间与空间上的连续性，本章选取了相邻3帧，相邻9个单元供27个单元的杂波信号将其进行组合，并进行随机重排复制得到一个$128\times 128$的二维数据，其示意图参看图 \ref{fig:unsurpvised_data}，总共有47549组训练样本。
 \begin{figure}[hbt]
 	\centering
-	\includegraphics[width=6.67cm]{figures/AE/unsurpvised_data}
-	\caption{输入样本示意图}
-	\label{fig:unsurpvised_data}
+	\includegraphics[width=6.67cm]{figures/emitter/svm_hard}
+	\caption{标准分类平面，即具有最大间隔的超平面。被圈起来的样本组成了这个超平面，其被称作支持向量。}
+	\label{fig:hyperplanes}
 \end{figure}
-本章根据图\ref{fig:cae}设计的卷积自编码器进行特征的降维，该部分进行30次迭代，学习方法为Adam，嵌入层为10维，也即利用10维的特征向量对原始输入信号进行表示。
-然后根据此特征向量，随机进行20次K-均值算法，然后从中选取最优结果作为起始的聚类中心点，此也作为我们的一个对比算法。损失函数的权重系数$\beta = 0.1$，学生t分布的自由度$\alpha = 1$。
-最终的优化问题通过小批量随机梯度下降和反向传播得到有效解决，其中批长度为256，学习率为\textcolor{red}{1231}。
+因此求解标准分类超平面的最大间隔的问题，就转变为下面的优化问题。
+\begin{equation}
+	\min \limits_{w\in \mathcal{H}} \tau(w)=\frac{1}{2}||w||^2\quad s.t. \quad y_i(w\cdot x_i +b) \geq 1 \quad \forall i
+	\label{equ:optimization}
+\end{equation}
 
-% \subsection{仿真结果分析}
-实验结果如表\ref{tab:uns}所示。利用深度嵌入卷积算法的正确度相比于K-均值算法有了显著的提高，而对于添加了重构损失函数后的结果又有了进一步的提高。
+为了使得约束更好表示，可以用拉格朗日优化算法对上式重新描述，
+\begin{equation}
+	\min \limits_{w,b} L(w,b,\alpha)=\frac{1}{2}||w||^2-\sum_{i=1}^l\alpha_i y_i (x_i w + b) + \sum_{i=1}^l{\alpha_i}
+	\label{equ:lagrange}
+\end{equation}
+其中$\alpha_i \geq 0$为约束条件。
+
+在实际计算过程中，可以通过对偶定义求解优化方程\equref{equ:lagrange}，通过最大化方程\equref{equ:lagrange}相对于$\alpha$来求取其相对于$w$和$b$的最小值。利用 Karush-Kuhn-Tucker 条件，则\equref{equ:lagrange}变为下面对偶形式：
+\begin{equation}
+	\max \limits_{\alpha} L_D=\sum_i{\alpha_i}-\frac{1}{2}\sum_{i,j}\alpha_i\alpha_jy_iy_jx_i\cdot x_j \quad s.t. \quad \forall i
+	\left\{
+		\begin{aligned}
+	   &\sum_i{\alpha_iy_i}=0  \\
+	   &\alpha_i \geq 0
+	   \end{aligned}
+		\right.
+\end{equation}
+因此，通过求解这个对偶优化问题，可以得到系数$\alpha_i$。其中满足$\alpha_i>0$的解称作支持向量，他们位于标准分类平面$H_1$或者$H_2$上。注意到，仅有$\alpha_i>0$的解影响最终的支持向量的选择。
+因此，可以得到决策函数：
+\begin{equation}
+	f(x)=w^Tx_i+b=\sum_{i=1}^My_i\alpha_i(x_i^Tx)+b
+\end{equation}
+决策函数的符号取决于预测样本$x$。
+
+此处讨论的情形的一个假设是可以把所有的样本完全分为不同的类别。但是显然在大多数情况下，这种假设是不成立的。另外，这种假设也会导致过拟合现象的出现。因此，文献 \cite{cortes1995support} 提出了软间隔的支持向量机。
+其主要思想是，通过引入正的松弛变量$\xi_i$来放宽\equref{equ:constraint1}和\equref{equ:constraint2}的约束。基于此，得到\equref{equ:constraint_soft}
+
+\begin{equation}
+	\forall i \quad
+	\left\{
+	 \begin{aligned}
+	&w\cdot x_i + b \geq +1-\xi_i \quad y_i=+1  \\
+	&w\cdot x_i + b \leq -1-\xi_i \quad y_i=+1  \\
+	&\xi_i \geq 0
+	\end{aligned}
+	 \right.
+	\label{equ:constraint_soft}
+\end{equation}
+这允许一些样本在边缘内部，甚至在相反类别的情况下进一步交叉（见图\ref{fig:softmargin}）。 虽然这种松弛使得支持向量机能够灵活地降低异常值的影响，但是从优化问题求解的角度来看，任意大的松弛变量$\xi_i$可能会导致SVM获得平凡解或次优解。 因此，可以通过使松弛变量成为\equref{equ:optimization}的一部分，来限制松弛度：
+\begin{equation}
+	\min \limits_{w\in \mathcal{H},\xi\in \mathbb{R}^m} \tau(w,\xi)=\frac{1}{2}||w||^2+C\sum_{i=1}^m {\xi_i}
+\end{equation}
+\begin{figure}[hbt]
+	\centering
+	\includegraphics[width=6.67cm]{figures/emitter/svm_soft}
+	\caption{软间隔支持向量机}
+	\label{fig:softmargin}
+\end{figure}
+其约束条件为\equref{equ:constraint_soft}。超参数$C>0$是针对于误分类的惩罚系数，该系数需要根据不同的分类任务和数据集进行调整。
+将其变为的对偶形式，则有
+\begin{equation}
+	\max \limits_{\alpha} L_D=\sum_i{\alpha_i}-\frac{1}{2}\sum_{i,j}\alpha_i\alpha_jy_iy_jx_i\cdot x_j \quad s.t. \quad \forall i
+	\left\{
+		\begin{aligned}
+	   &\sum_i{\alpha_iy_i}=0  \\
+	   &C \leq \alpha_i \geq 0
+	   \end{aligned}
+		\right.
+	\label{equ:cdotdual}
+\end{equation}
+
+目前只是分析了线性支持向量机的问题，为了应对非线性分类问题，引入了核函数的概念。将训练数据通过某函数$\Phi:\mathbb{R}^d\mapsto\mathcal{H}$。经过该变换后，只需要将原来计算$\mathbb{R}^d$的$x_i\cdot x_j$变为计算在$\mathcal{H}$域的向量积$\Phi(x_i)\cdot\Phi(x_j)$。为了降低计算量，可以引入核函数$K$来避免数据$x_i$和$x_j$从$\mathbb{R}^d$映射到$\mathcal{H}$。
+\begin{equation}
+	K(x_i,x_j)=\Phi(x_i)\cdot\Phi(x_j)
+\end{equation}
+因此，可以将\equref{equ:cdotdual}变为：
+\begin{equation}
+	\max \limits_{\alpha} L_D=\sum_i{\alpha_i}-\frac{1}{2}\sum_{i,j}\alpha_i\alpha_jy_iy_j K(x_i,x_j)\quad s.t. \quad \forall i
+	\left\{
+		\begin{aligned}
+	   &\sum_i{\alpha_iy_i}=0  \\
+	   &C \leq \alpha_i \geq 0
+	   \end{aligned}
+		\right.
+\end{equation}
+常用的核函数有下面几种：
+\begin{itemize}
+	\item 线性核函数:$K(x,y)=x^Ty+C$
+	\item 多项式核函数：$K(x,y)=(x^Ty+C)^d$
+	\item RBF 核函数:$K(x,y)=e^{\frac{-||x-y||^2}{2\sigma^2}}$
+	\item Sigmoid 核函数:$K(x,y)=\tanh(\alpha x^Ty+C)$
+\end{itemize}
+\subsubsection{支持向量机设计}
+本章利用所有的目标数据和未知目标的数据来作为训练样本对该SVM分类器进行训练，本部分以深度卷积神经网络的输出作为该分类器的输入，利用各类别的概率作为其特征进行训练识别。由于在类别的识别过程中，存在一定的波动性，这个会影响结果是否属于未知类别的分类判断，本章选取来自同一个辐射源的连续10拍的识别结果进行一个平均作为最终的输入。
+
+下面是支持向量机分类器的设计，首先是核函数的选择。核函数将输入空间映射到高维特征空间，最终在高维特征空间中构造出最优分类超平面，从而把平面上本身不好分的非线性数据分开。常用的核函数为线性核函数和径向基核函数（ Radial Basis Function， RBF）。在核函数的选择方面，当特征数量很大时一般选用线性核函数，而对本章这种特征数量比较小的问题，一般选择径向基核函数。
+
+具有径向基核的支持向量机具有两个关键参数，惩罚参数$C$的和核参数$\sigma$，这两个参数的取值在很大程度上决定了SVM的性能的优劣。
+核参数$\sigma$主要影响样本数据在高维特征空间中分布的复杂程度，即维数。特征子空间的维数越高，那么得到的最优分类超平面就会越复杂。因此只有选择合适的核参数得到合适的特征子空间，才能得到泛化能力良好的SVM分类器。大量的实验数据表明，如果与样本点之间的距离很小，$\sigma \rightarrow 0$；如果与样本点之间的距离很大时，$\sigma \rightarrow \infty$；当$\sigma$很小，径向基核函数支持向量机得到的判别函数差不多是一个常数，出现过拟合现象。当$\sigma$很大时，样本的正确分类率也会比较低。
+
+惩罚参数是影响SVM算法性能的另一个重要因素。它的作用主要是调节特征子空间中SVM模型的置信范围与经验风险的比例，使支持向量机的泛化能力达到最好。特征子空间不同时，最优参数值取值也会不同。惩罚参数与经验误差的惩罚和SVM的复杂度成正比，与经验风险值成反比。因此，选择合适的惩罚参数也是非常重要的。
+
+\section{仿真实验与分析}
+\label{sec:sei_experiment}
+\subsection{实验环境}
+
+本章利用了来自13架民航飞机的气象雷达辐射源的数据，飞机信息参见表\ref{tab:flight}
 \begin{table}[hbt]
 	\renewcommand{\arraystretch}{1.3}
-	\caption{无监督聚类精度对比表}
-	\label{tab:uns}
+	\caption{辐射源信号数据}
+	\label{tab:flight}
 	\centering\sWuhao
 	\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 		\toprule
-		 方法 & 无监督聚类精度 & 时间  \\
+		 飞机地址码 & 飞机航班号 & 飞机型号  \\
 		 \midrule
-		CAE + K-均值 & $66\%$ & 12\\
-		DECC（$\beta=0$) & $23\%$ & 12 \\
-		DECC & $453\%$ & 12\\
+		 7BF014 & CCA1416 & Airbus A330 (twin-jet)\\
+		 780DB3 & TBA9881 & Airbus A330 (twin-jet) \\
+		 780E06 & CSN3438 & Airbus A330 (twin-jet\\
+		 780EBB & CES293 & 	Airbus A321 (twin-jet)\\
+		 780EBF & CES2342 & Airbus A320 (twin-jet)\\
+		 7804F2 & ZH9164 & Airbus A320 (twin-jet)\\
+		 7804F4 & CES5856 & Boeing 737\\
+		 7806FC & CSN6402 & Airbus A320 (twin-jet)\\
+		 7808F0 & CES5373 & Airbus A319 (twin-jet)\\
+		 78057F & CCA4103 & Airbus A321 (twin-jet\\
+		 780063 & CCA4377 & Airbus A319 (twin-jet)\\
+		 780375 & CSC8253 & Airbus A319 (twin-jet)	\\
+		 781022 & EU2731 & Airbus A319 (twin-jet)\\
 		 \bottomrule
 	\end{tabularx}
 \end{table}
-此处无监督聚类精度（unsupervised clustering accuracy, ACC）的定义为：
-\begin{align}
-	ACC &= \max\limits_m\frac{\sum_{i=1}^Ng(l_i,m(c_i))}{N} \\
-	g(l_i,m(c_i)) &= \left\{
-		\begin{array}{rcl}
-		1       &      & l_i = m(c_i)\\
-		0       &      & l_i \neq m(c_i)
-		\end{array} \right. \nonumber
-\end{align}
-其中，$l_i$为真实的标签，$c_i$为算法的聚类结果，$m$是聚类结果与实际标签类别之间的一一对应，其遍历所有可能假设。
+
+本章的气象雷达辐射源信号，原始的雷达信号为如图 \ref{fig:IQ} 所示的I/Q信号，
+为了更好的捕捉到雷达辐射源回波的特征信息，本章对数据进行了一个变换，利用快速傅里叶变换求取其模糊函数，并做偏移为0附近的一个切片作为输入的特征向量,经过变换后的样本的特征如图\ref{fig:diff_data}所示。
+\begin{figure}[hbt]
+	\centering
+	\begin{minipage}{7cm}
+		\centering
+		\includegraphics[width=6.67cm]{figures/emitter/IQA}
+		\caption{原始I/Q信号}
+		\label{fig:IQ}
+	\end{minipage}
+	\hspace{10pt}
+	\begin{minipage}{7cm}
+		\centering
+		\includegraphics[width=6.67cm]{figures/emitter/diff_data}
+		\caption{不同类别样本特征图}
+		\label{fig:diff_data}
+	\end{minipage}
+\end{figure}
+由于该变换后，数据之间的差距比较大，本章对数据利用离差标准化（Min-Max Normalization）方法进行归一化，是对原始数据的线性变换，使结果值映射到$[0 , 1]$之间。转换函数如下：
+\begin{equation}
+x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}}
+\end{equation}
+其中$x_{max}$为样本数据的最大值，$x_{min}$为样本数据的最小值。
+
+在数据的选择方面，本章从数据中选择出2至8个类别分别进行实验，对于每一个类别，也即每架飞机原始信号为100次雷达扫描周期的信号。
+由于深度学习需要大量的数据进行训练学习，而本身数据量偏少，故本章在已有数据的基础上在一定信噪比的前提下，生成部分仿真数据，最终每架飞机均有10000组信号。对于这些信号，本章选择其中的$70\%$作为训练样本，$20\%$用于交叉验证，$10\%$作为测试，同时在测试样本中添加与其等量的来自未训练类别也即未知类别的样本共同作为测试样本用来衡量其未知分类的识别率。
+本章采用网格搜索法对SVM参数进行调优，最终选择参数惩罚参数为$C=32$，核参数$\sigma=0.0312$。
+
+\subsection{实验结果分析}
+
+\subsubsection{深度卷积神经网络识别结果}
+
+首先验证深度卷积算法的识别正确率，利用8个类别的数据进行训练和测试，迭代次数为100次，其分类结果如表\ref{tab:cnn_29}所示。从表格中容易看出，每一个单独类别的分类精度都很高。
+\begin{table}[hbt]
+	\renewcommand{\arraystretch}{1.3}
+	\caption{深度卷积神经网络分类结果}
+	\label{tab:cnn_29}
+	\centering\sWuhao
+	\begin{tabular}{ccccccccc}
+		\toprule
+		 & 类别 A & 类别 B & 类别 C & 类别 D & 类别 E & 类别 F & 类别 G & 类别 H \\
+		 \midrule
+		 类别 A & 100\% & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+		 类别 B & 7.42\% & 92.58\% & 0 & 0 & 0.13 & 0 & 0 & 0 \\
+		 类别 C & 0 & 0 & 97.83\% & 0 & 0 & 2.17\% & 0 & 0 \\
+		 类别 D & 0 & 0 & 3\% & 97\% & 0 & 0 & 0 & 0 \\
+		 类别 E & 0 & 0 & 0 & 0 & 100\% & 0 & 0 & 0 \\
+		 类别 F & 0 & 0 & 0.08\% & 0 & 0 & 99.92\% & 0 & 0 \\
+		 类别 G & 0 & 0 & 1.08\% & 0 & 0 & 0 & 98.92\% & 0 \\
+		 类别 H & 1.63\% & 0 & 0 & 0 & 0 & 0.63 & 0 & 98.37\% \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+同对迭代次数与识别准确率和损失函数进行了验证，其结果如图 \ref{fig:openset_epoch}、图\ref{fig:diff_loss}和表\ref{tab:cnn_epoch_29}所示，无论是训练样本还是测试样本，其精度与损失函数均很快收敛到比较好的水平，不过相应的学习时间也正比增长，故在实际工程中需要对精度和时间进行衡量选取一个最合适的迭代次数。
+\begin{table}[hbt]
+	\renewcommand{\arraystretch}{1.3}
+	\caption{深度卷积神经网络分类结果}
+	\label{tab:cnn_epoch_29}
+	\centering\sWuhao
+		\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+		\toprule
+		迭代次数 & 训练样本学习正确率 & 测试样本学习正确率  &  学习时间（s） \\
+		 \midrule
+			1 & 0.4670 & 0.5782 & $1.0931\times 10^3$ \\
+			2 & 0.7658 & 0.7758 & $2.3572\times 10^3$ \\
+			10 & 0.9414 & 0.8102 & $1.1444\times 10^4$ \\
+			20 & 0.9709 & 0.9065 & $2.1370\times 10^4$ \\
+			40 & 0.9819 & 0.9883 & $4.3181 \times 10^4$ \\
+			50 & 0.9839 & 0.9830 & $5.3437 \times 10^4$ \\
+			60 & 0.9866 & 0.9746 & $6.4143 \times 10^4$ \\
+			70 & 0.9903 & 0.9904 & $7.4849 \times 10^4$ \\
+			80 & 0.9904 & 0.9798 & $8.5597 \times 10^4$ \\
+			90 & 0.9908 & 0.9872 & $9.6328\times 10^4$ \\
+			100 & 0.9902 & 0.9811 & $1.0711 \times 10^5$ \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
+\begin{figure}[hbt]
+	\centering
+	\begin{minipage}{7cm}
+		\centering
+		\includegraphics[width=6.67cm]{figures/emitter/diff_epoch}
+		\caption{迭代次数与识别准确率曲线图}
+		\label{fig:openset_epoch}
+	\end{minipage}
+	\hspace{10pt}
+	\begin{minipage}{7cm}
+		\centering
+		\includegraphics[width=6.67cm]{figures/emitter/diff_loss}
+		\caption{迭代次数与损失函数曲线图}
+		\label{fig:diff_loss}
+	\end{minipage}
+\end{figure}
+\subsubsection{Open Set 分类器识别结果}
+
+在上述样本的情形下，可以通过选取不同的类别数目，进行实验得到表\ref{tab:nb_classes}的识别结果。易知，随着样本类别数的增加，对于未知分类的识别准确率也随之有了大幅度的增加，而另一方面随着类别的增加，对于每个类别的识别准确率仍然维持在比较高的水平。
+
+\begin{table}[hbt]
+	\renewcommand{\arraystretch}{1.3}
+	\caption{不同已知类别个数数据识别结果}
+	\label{tab:nb_classes}
+	\centering\sWuhao
+	\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
+		\toprule
+		 已知类别数目 & 已知类别识别正确率 & 未知类别分辨正确率 \\
+		\midrule
+		2 & 99.55\% & 84.32\% \\
+		3 & 99.59\% & 93.10\% \\
+		4 & 99.00\% & 97.81\% \\
+		5 & 99.75\% & 98.42\% \\
+		6 & 98.63\% & 98.85\% \\
+		7 & 99.28\% & 99.22\% \\
+		8 & 97.86\% & 99.14\% \\
+		\bottomrule
+	\end{tabularx}
+\end{table}
+
 \section{小结}
-本章结合卷积神经网络与自编码器提出了深度嵌入卷积聚类方法，其通过利用卷积自编码器进行提取并在损失函数中将KL散度与重构损失两部分结合，有效提高了聚类的精度。
-虽然与有监督学习算法相比，本章的算法精度仍需进一步提高，但是无监督学习的特性使得其避免了繁琐的标定过程。
-本章的主要贡献如下：
-\begin{itemize}
-	\item 本章设计了可以以端到端方式训练的卷积自编码器来从未标记的数据中学习特征。通过在地海杂波数据中包含空间、时间信息，通过添加卷积层、卷积转置层和全连接层，设计了好于传统堆栈自编码器的卷积自编码器。
-	\item 本章提出了深度嵌入卷积聚类算法来自动聚类地海杂波，DECC利用了卷积自编码器提取局部特征的优势。
-	\item 利用天波超视距雷达的实际地海杂波数据进行了实验，结果验证了深度嵌入聚类算法的有效性。
-\end{itemize}
+\label{sec:sei_summary}
+本章针对复杂电磁环境下辐射源的识别面临的电磁信号干扰大、雷达信号参数相近等问题与挑战，利用深度学习的思想与方法，深入研究辐射源脉内细微特征，设计合适的神经网络结构，并基于民航机载气象雷达数据进行初步验证。本章的主要贡献如下：
+
+（1）本章设计了Meta-Recognition，实现了对辐射源中未知分类的辨别。
+
+% （1）利用深度学习方法进行辐射源识别前沿。虽然已有研究利用神经网络、支持向量机等机器学习算法进行识别，但是仍然需要基于雷达信号的基本参数，没有考虑信号的内部特征参数。
+
+（2）本章采用方法具有较强的抗噪声、抗干扰能力以及较好的鲁棒性。传统方法进行辐射源个体识别前均需进行降噪、多径抑制和分选等复杂的信号预处理工作，这些操作会在一定程度上削弱雷达的个体特征。通过对现有辐射源信号进行分析，深度学习方法利用其脉内细微特征作为训练样本，使得识别准确率有了较大的进步。
+% 可以通过大量的样本，智能地判断各特征的权重，通过赋予不同的权重在保留雷达个体特征的情况下，避免干扰的影响。

@@ -1,4 +1,4 @@
-%% 
+%%
 %% This is file `nputhesis.cls'.
 %%
 \NeedsTeXFormat{LaTeX2e}
@@ -68,7 +68,7 @@
 \def\@@title[#1]#2{\def\@title@en{#1}\def\@title{#2}}
 \def\@@author[#1]#2{\def\@author@en{#1}\def\@author{#2}}
 \def\@@major[#1]#2{\def\@major@en{#1}\def\@major{#2}}
-\def\@@supervisor[#1]#2{\def\@supervisor@en{#1}\def\@supervisor{#2}} 
+\def\@@supervisor[#1]#2{\def\@supervisor@en{#1}\def\@supervisor{#2}}
 \def\@@applydate[#1]#2{\def\@applydate@en{#1}\def\@applydate{#2}}
 \def\@title{} \def\@author{} \def\@major{} \def\@supervisor{} \def\@applydate{}
 
@@ -146,12 +146,12 @@
     \vspace*{2cm}
     \begin{center}
       \settowidth{\name@length}{\zihao{3}\npu@schoolname}
-      \divide\name@length by 12 
+      \divide\name@length by 12
       \multiply\name@length by 17
       \makebox[\name@length][s]{\zihao{3}\npu@schoolname}
       \vskip5mm
       \settowidth{\name@length}{\zihao{1}\npu@degree}
-      \divide\name@length by 12 
+      \divide\name@length by 12
       \multiply\name@length by 17
       \makebox[\name@length][s]{\zihao{1}\npu@degree}
       \vskip5mm
@@ -217,7 +217,7 @@
       \vspace{1\baselineskip}
       In partial fulfillment of the requirement\\
       For the degree of\\
-      Doctor of \@major@en\\
+      Master of \@major@en\\
       \vspace{4\baselineskip}
       Xi'an P. R. China\\
       \@applydate@en

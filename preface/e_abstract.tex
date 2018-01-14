@@ -1,7 +1,27 @@
 % 英文摘要
 \begin{Abstract}
-	\lipsum[1-4] 
+Under the background of radar signal classification, this paper focuses on sea/land clutter recognition for Over-the-Horizon Radar(OTHR) and specific emitter identification using deep learning methodology, as follows:
+
+
+1）The results of OTHR sea/land clutter recognition can be used for coordinate registration, which can help improve the target positioning accuracy effectively.
+Based on the analysis of sea/land clutter spectrum data, a six-layer deep convolution neural network classifier is constructed. The original spectrum data is preprocessed by cleansing, trimming, and fusion.
+Adaptive Moment Estimation method is used to train the network, which can give a stable learning rate.
+As a real-world project, the classification threshold is adjusted according to the features of clutter. The results are evaluated by the classification accuracy and the matching accuracy with actual map.
+Experimental results show that the clutter recognition algorithm based on deep convolution neural network still has high recognition accuracy under poor ionospheric environment.
+
+2）In order to overcome the high cost of labeling large amounts of data and the difficult to label some data  accurately manually, this paper further proposed a deep embeddeding convolution method for sea/land clutter clustering.
+Spatial locations and time sequences information is added to original clutter spectrum data. The network contains convolutional layer, deconvolutional layer and fully connected layer.
+A convolutional autoencoders structure is developed to learn embedded features in an end-to-end way.
+The experimental results show the effectiveness of deep embeddeding convolution clustering method.
+
+3）In order to solve the problems of recognizing emitters in similar radar signal parameters and the existence of unknown types emitterin complex electromagnetic environment, this paper proposed a specific emitter identification method based on deep learning.
+By analyzing the signal of the specific emitters and using the ambiguity function slice as feature vectors,
+a 10-layer one-dimensional convolution neural network is constructed as the primary classifier to classify the input signals firstly. Unknown types of specific emitters are identified by a support vector machine classifier as Meta-Recognition.
+The classification accuracy of the algorithm proposed in this paper is high in the experiments of meteorological radars from multiple aircraft.
+
+
+
 	\begin{Keywords}
-		English, Abstract
+		Radar Signal Classification, Sea/Land Clutter Recognition for Over-The-Horizon Radar, Specific Emitter Identification, Deep Learning, Convolutional Neural Networks
 	\end{Keywords}
 \end{Abstract}
