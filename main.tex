@@ -1,3 +1,5 @@
+% !Mode:: "TeX:UTF-8"
+
 %%UTF-8
 \documentclass[twoside]{nputhesis}
 %\documentclass[oneside]{nputhesis}
@@ -12,7 +14,7 @@
 \usepackage{standalone}
 \usepackage{tabularx} % for 'tabularx' environment
 \usepackage[numbers,sort&compress]{natbib}
-
+\usepackage[section]{placeins}
 
 \usepackage{lipsum}
 
@@ -39,7 +41,10 @@
 \newcommand{\sWuhao}{\fontsize{10.5pt}{10.5pt}\selectfont}      % 五号, 单倍
 \newcommand\equref[1]{公式(\ref{#1})}
 
-\def\final{1} % 1--明评，0--盲屏
+\usepackage{enumitem}
+\setitemize[1]{itemsep=0pt,partopsep=0pt,parsep=\parskip,topsep=5pt}
+
+\def\final{1} % 1--明评，0--盲评
 
 
 \usepackage{multirow}
@@ -47,7 +52,9 @@
 \classno{TP27}
 %\secretlevel{}
 \title[A Research on Radar Signal Classification using Deep Learning Based Techniques]{基于深度学习的雷达信号分类算法研究}
-\applydate[March 2018]{2018~年~3~月}
+\applydate[January 2018]{2018~年~1~月}
+\major[Control Theory and Control Engineering]{控制理论与控制工程}
+
 % \support{本文研究得到青年科学基金项目“基于子模优化的远程预警传感器管理研究”（基金编号：61503305）资助。}
 
 \begin{document}
@@ -57,12 +64,10 @@
     \if\final1
         \author[Zhang Zhishan]{张治山}
         \authorno{2015201518}
-        \major[Control Theory and Control Engineering]{控制理论与控制工程}
         \supervisor[Pan Quan]{潘泉}
     \else
         \author[\hspace{20 mm}]{\hspace{20 mm}}
         \authorno{\hspace{20 mm}}
-        \major[\hspace{20 mm}]{\hspace{20 mm}}
         \supervisor[\hspace{20 mm}]{\hspace{20 mm}}
     \fi
 
@@ -78,9 +83,9 @@
     \mainmatter
 \fi
 % 正文内容
-\input{chapters/chapter01.tex}
+ \input{chapters/chapter01.tex}
 \input{chapters/chapter02.tex}
-\input{chapters/chapter03.tex}
+ \input{chapters/chapter03.tex}
 \input{chapters/chapter04.tex}
 \input{chapters/chapter05.tex}
 \input{chapters/chapter06.tex}
@@ -110,9 +115,3 @@
 \fi
 \end{document}
 
-
-% “盲评格式”。
-% 	在题名页（俗称内封面）中删除作者和导师姓名
-% 	在“攻读博士学位期间发表的学术论文和参加科研情况”中删除作者和导师姓名
-% 	在“致谢”中删除作者和导师姓名
-% 	在“学位论文知识产权声明书、学位论文原创性声明”上不署名
