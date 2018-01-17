@@ -19,9 +19,9 @@
 与传统利用已知类别的样本进行训练测试的机器学习算法不同，本站的问题是在Open Set的背景下，需要考虑输入未知分类样本的情况。
 由于在复杂电磁环境下传统的辐射源个体识别面临识别能力差和无法识别未知目标等问题与挑战，因此需要寻找一种新的方法解决该问题。
 
-本章综合雷达信号处理、深度学习等多学科理论，通过对实际数据的分析，结合深度卷积神经网络与支持向量机方法，以雷达信号的模糊函数切片作为训练样本的特征向量，构建了一个可以对未知分类进行辨识的分类器。最后，利用实际数据进行验证，证明本章提出的分类器具有很高的准确性。
+本章综合雷达信号处理、深度学习等多学科理论，通过对实际数据的分析，结合深度卷积神经网络与支持向量机方法，以雷达信号的模糊函数切片作为训练样本的特征向量，构建了一个可以对未知分类进行辨识的分类器。最后，利用数据进行验证，证明本章提出的分类器具有很高的准确性。
 
-本章安排如下： \ref{sec:sei_data}节对辐射源信号进行了分析，并对其进行预处理，求取其模糊函数切片，\ref{sec:sei_method}节构建了本章的Open Set 分类器，详细地阐述了深度卷积神经网络主分类器与支持向量机Meta-Recognition的设计过程，\ref{sec:sei_experiment}节利用实际数据对分类器已知分类识别和未知分类辨别的性能进行了验证，\ref{sec:sei_summary}节进行本章总结。
+本章安排如下： \ref{sec:sei_data}节对辐射源信号进行了分析，并对其进行预处理，求取其模糊函数切片，\ref{sec:sei_method}节构建了本章的Open Set 分类器，详细地阐述了深度卷积神经网络主分类器与支持向量机Meta-Recognition的设计过程，\ref{sec:sei_experiment}节利用数据对分类器已知分类识别和未知分类辨别的性能进行了验证，\ref{sec:sei_summary}节进行本章总结。
 
 \section{辐射源信号分析}
 \label{sec:sei_data}
@@ -29,24 +29,24 @@
 本章所获得的信号为雷达辐射源的I/Q两路数据，这是一种在雷达信号处理领域常见的用来描述信号的方法。其中I表示In-Phase，即同相；Q表示Quadrature，即正交，与I相位之差为90度。
 设需要表示的信号的峰值幅度为$A$、相位角为$\phi$，则有：
 \begin{equation}
-	I = A\cos{\phi}
+	I = A\cos{\phi},
 	\label{equ:i}
 \end{equation}
 \begin{equation}
-	Q = A\sin{\phi}
+	Q = A\sin{\phi}.
 	\label{equ:q}
 \end{equation}
 也即可以利用\equref{equ:signal}表示信号：
 \begin{equation}
-	Ae^{i\phi}=A(\cos(\phi) + i\sin(\phi))=I+Qi
+	Ae^{i\phi}=A(\cos(\phi) + i\sin(\phi))=I+Qi.
 	\label{equ:signal}
 \end{equation}
 从而可以根据\equref{equ:i}和\equref{equ:q}利用I/Q数据求取信号的峰值幅度和相位角：
 \begin{equation}
-	A=\sqrt{I^2+Q^2}
+	A=\sqrt{I^2+Q^2},
 \end{equation}
 \begin{equation}
-	\phi=tan^{-1}(Q/I)
+	\phi=tan^{-1}(Q/I).
 \end{equation}
 在完成信号形式的转换后，首先需要对信号进行初步的预处理，剔除无用和错误的数据。
 在特征提取优化方面，合理的特征是分类识别的基础。由于存在相同型号的辐射源，利用简单的参数特征无法很好的完成辐射源的个体识别，但是在实际中辐射源自身存在相位噪声以及各类杂散输出，此部分特征可以用来区分出型号、参数均相同的辐射源，因此需要选取一种可以提取雷达辐射源这种无意调制产生的信号脉内细微特征的方法。
@@ -54,19 +54,19 @@
 \subsection{模糊函数}
 信号$x(t)$的瞬时自相关函数为$R_x(t,\tau)=x(t+\tau/2)x^{*}(t-\tau/2)$，其中$\tau$为时延，模糊函数的定义为，
 \begin{equation}
-A(\tau,\nu) = \int_{-\infty}^{+\infty}R_x(t,\tau)e^{j2\pi\nu t}dt
+A(\tau,\nu) = \int_{-\infty}^{+\infty}R_x(t,\tau)e^{j2\pi\nu t}dt,
 \label{equ:defineaf}
 \end{equation}
 即$R_x(t,\tau)$关于时间$t$的傅里叶反变换。
 
 为了方便在数字信号中使用，\equref{equ:defineaf}可以经过变换等价于\equref{equ:afcon}的形式：
 \begin{equation}
-A(\tau,\nu) = \int_{0}^{\tau}x(t)x^{*}(t+\tau)e^{j2\pi\nu t}dt
+A(\tau,\nu) = \int_{0}^{\tau}x(t)x^{*}(t+\tau)e^{j2\pi\nu t}dt.
 \label{equ:afcon}
 \end{equation}
 对信号均匀采样，即对接收信号和参考信号离散化后，\equref{equ:afcon}可以表示为：
 \begin{equation}
-A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{N}}
+A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{N}},
 \end{equation}
 其中，$\tau_l=l/f_s$、$\nu_m=mf_s/N$。
 
@@ -95,8 +95,8 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 \label{sec:sei_method}
 通常的识别或者分类系统仅考虑的是一个闭集分类系统，然而在现实世界中，这种分类系统会遇到很大的问题。由于其最基本的假设是所有的类别均为先验已知，那么就会出现问题，例如在训练样本中不存在类别的样本就会被错误的分到某个类别中去。这种在训练过程提供不完整的信息，而在测试时添加未知分类的问题，称作Open Set识别\ucite{scheirer2013toward, jain2014multi}。该问题还可以描述为需要在测试过程中拒绝未知样本，Open Set目标识别系统必须可以准确的处理以下三种类型的数据类：
 \begin{itemize}
-	\item 已知的（目标）类，被标注为正训练样本的数据。
-	\item 已知的未知（非目标）类，被标注为负训练样本的数据。
+	\item 已知的（目标）类，被标注为正训练样本的数据，
+	\item 已知的未知（非目标）类，被标注为负训练样本的数据，
 	\item 未知的未知（非目标）类，在训练样本中不存在的类别的数据。
 \end{itemize}
 传统的机器学习算法均是针对闭集数据设计的，随着识别算法应用场景的增多和对精度要求的提高，许多学者开始了对Open Set识别的研究。Simonson\ucite{simonson1998probabilistic}提出了一种称作概率融合(probabilistic fusion, PF)的利用统计的方法来进行Open Set识别，其主要通过合并来自不同数据源的证据得到一个统计测试模型，根据此模型的分布来对类别进行判断。Scheirer等人\ucite{scheirer2011meta}提出了一种通过分析后验数据得分来进行类型判断的方法。
@@ -155,8 +155,8 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 对于一个线性分类问题，假设所有数据均满足约束：
 \begin{equation}
 \begin{array}{cc}
-	w\cdot x_i +b \geq + 1 \quad y_i &= +1 \\
-	w\cdot x_i +b \leq + 1 \quad y_i &= -1
+	w\cdot x_i +b \geq + 1 \quad y_i &= +1, \\
+	w\cdot x_i +b \leq + 1 \quad y_i &= -1,
 	\label{equ:constraint}
 \end{array}
 \end{equation}
@@ -167,7 +167,7 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 \end{equation}
 \equref{equ:svm} 中的训练样本构成了图 \ref{fig:hyperplanes} 中的分类平面$H_1$与$H_2$，间隔 $\rho$ 可以通过计算$H_1$与$H_2$的距离得到：
 \begin{equation}
-	\rho=\frac{|1-b|}{||w||}-\frac{|-1-b|}{||w||}=\frac{2}{||w||}
+	\rho=\frac{|1-b|}{||w||}-\frac{|-1-b|}{||w||}=\frac{2}{||w||}.
 \end{equation}
 \begin{figure}[hbt]
 	\centering
@@ -182,7 +182,7 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 \end{equation}
 为了更好表示约束，可以用拉格朗日优化算法对\equref{equ:optimization}重新表示：
 \begin{equation}
-	\min \limits_{w,b} L(w,b,\alpha)=\frac{1}{2}||w||^2-\sum_{i=1}^l\alpha_i y_i (x_i w + b) + \sum_{i=1}^l{\alpha_i}
+	\min \limits_{w,b} L(w,b,\alpha)=\frac{1}{2}||w||^2-\sum_{i=1}^l\alpha_i y_i (x_i w + b) + \sum_{i=1}^l{\alpha_i},
 	\label{equ:lagrange}
 \end{equation}
 其中$\alpha_i \geq 0$为约束条件。
@@ -200,7 +200,7 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 因此，通过求解该对偶优化问题，可以得到系数$\alpha_i$，其中满足$\alpha_i>0$的解称作支持向量，他们位于标准分类平面$H_1$或者$H_2$上。注意到，仅有$\alpha_i>0$的解影响最终的支持向量的选择。
 因此，可以得到决策函数：
 \begin{equation}
-	f(x)=w^Tx_i+b=\sum_{i=1}^My_i\alpha_i(x_i^Tx)+b
+	f(x)=w^Tx_i+b=\sum_{i=1}^My_i\alpha_i(x_i^Tx)+b.
 \end{equation}
 决策函数的符号取决于预测样本$x$。
 
@@ -240,9 +240,9 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 	\label{equ:cdotdual}
 \end{equation}
 目前只是分析了线性支持向量机的问题，为了应对非线性分类问题，引入了核函数的概念。
-将训练数据通过某函数$\Phi:\mathbb{R}^d\mapsto\mathcal{H}$，经过该变换后，只需要将原来计算$\mathbb{R}^d$的$x_i\cdot x_j$变为计算在$\mathcal{H}$域的向量积$\Phi(x_i)\cdot\Phi(x_j)$。为了降低计算量，可以引入核函数$K$来避免数据$x_i$和$x_j$从$\mathbb{R}^d$映射到$\mathcal{H}$：
+将训练数据通过某函数$\Phi:\mathbb{R}^d\mapsto\mathcal{H}$，经过该变换后，只需要将原来计算$\mathbb{R}^d$的$x_i\cdot x_j$ 变为计算在$\mathcal{H}$域的向量积$\Phi(x_i)\cdot\Phi(x_j)$。为了降低计算量，可以引入核函数$K$来避免数据$x_i$和$x_j$从$\mathbb{R}^d$映射到$\mathcal{H}$：
 \begin{equation}
-	K(x_i,x_j)=\Phi(x_i)\cdot\Phi(x_j)
+	K(x_i,x_j)=\Phi(x_i)\cdot\Phi(x_j).
 \end{equation}
 因此，可以将\equref{equ:cdotdual}变为：
 \begin{equation}
@@ -303,7 +303,7 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 	\end{tabularx}
 \end{table}
 
-本章利用的数据是气象雷达辐射源信号，原始的雷达信号是如图 \ref{fig:IQ} 所示的I/Q信号，
+本章利用的数据是机载气象雷达辐射源信号，原始的雷达信号是如图 \ref{fig:IQ} 所示的I/Q信号，
 为了更好的捕捉到雷达辐射源回波的特征信息，本章对数据进行了一个变换，利用快速傅里叶变换求取其模糊函数，并取偏移为0附近的一个切片作为输入的特征向量,经过变换后的样本的特征如图\ref{fig:diff_data}所示。
 \begin{figure}[hbt]
 	\centering
@@ -325,7 +325,7 @@ A(\tau_l,\nu_m) = A(l, m) = \sum_{n = 0}^{N-1}x(n)x^{*}(n+l)e^{\frac{j2\pi m n}{
 本章对数据利用离差标准化（Min-Max Normalization）方法进行归一化，
 转换函数如下：
 \begin{equation}
-x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}}
+x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}},
 \end{equation}
 其中$x_{max}$为样本数据的最大值，$x_{min}$为样本数据的最小值。
 
@@ -427,11 +427,5 @@ x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}}
 
 \section{小结}
 \label{sec:sei_summary}
-本章针对复杂电磁环境下辐射源的识别面临的电磁信号干扰大、雷达信号参数相近等问题与挑战，利用深度学习的思想与方法，深入研究辐射源脉内细微特征，设计合适的神经网络结构，并基于民航机载气象雷达数据进行初步验证。本章的主要贡献如下：
-
-（1）本章设计了Meta-Recognition，实现了对辐射源中未知分类的辨别。
-
-% （1）利用深度学习方法进行辐射源识别前沿。虽然已有研究利用神经网络、支持向量机等机器学习算法进行识别，但是仍然需要基于雷达信号的基本参数，没有考虑信号的内部特征参数。
-
-（2）本章提出的方法具有较强的抗噪声、抗干扰能力以及较好的鲁棒性。传统方法进行辐射源个体识别前均需进行降噪、多径抑制和分选等复杂的信号预处理工作，这些操作会在一定程度上削弱雷达的个体特征。通过对现有辐射源信号进行分析，深度学习方法利用其脉内细微特征作为训练样本，使得识别准确率有了较大的进步。
-% 可以通过大量的样本，智能地判断各特征的权重，通过赋予不同的权重在保留雷达个体特征的情况下，避免干扰的影响。
+本章针对复杂电磁环境下辐射源的识别面临的电磁信号干扰大、雷达信号参数相近等问题与挑战，利用深度学习的思想与方法，深入研究辐射源脉内细微特征，设计合适的深度卷积神经网络结构和支持向量机Meta-Recognition，实现了对辐射源中未知分类的辨别。基于民航机载气象雷达数据对本章提出的方法进行初步验证，表明该方法具有较强的抗噪声、抗干扰能力以及较好的鲁棒性。
+% 传统方法进行辐射源个体识别前均需进行降噪、多径抑制和分选等复杂的信号预处理工作，这些操作会在一定程度上削弱雷达的个体特征。通过对现有辐射源信号进行分析，深度学习方法利用其脉内细微特征作为训练样本，使得识别准确率有了较大的进步。

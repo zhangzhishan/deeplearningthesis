@@ -3,19 +3,17 @@
 \chapter{基于深度嵌入卷积聚类方法的地海杂波无监督分类}
 \label{sec:decc}
 \section{引言}
-聚类方法如今已经在各个领域得到了广泛应用，但是传统的聚类算法的性能受数据维数以及样本数据量的影响，会产生维数灾难的问题。
-对数据集规模较大的情形，有一些研究只选择数据集的一个子集来加速聚类过程\ucite{shinnou2008spectral}。
-为了解决计算复杂度的问题，以往的研究往往首先将高维度的数据映射到低维，然后将嵌入数据聚类到这个新的子空间中\ucite{roth2004feature}。
-这类算法可以分为两个阶段：特征学习和聚类，其主要思想是向目标函数中添加表征稀疏性或者是图形约束的先验知识进行训练学习\ucite{tian2014learning}。
+由于天波雷达地海杂波频谱数据量大，进行人工标定的成本十分昂贵，且当雷达工作频率变化导致数据的相干积累点数变化时需要重新标定数据对网络进行训练。无监督学习（又称聚类）算法是解决该问题的一个很好的思路，但是传统的聚类算法的性能受数据维数以及样本数据量的影响，会产生维数灾难的问题。为了克服这个困难，研究者一般选择将高维度的数据映射到低维，然后将嵌入数据聚类到这个新的子空间中\ucite{roth2004feature}的方法，该方法分为特征学习和聚类这两个割裂的阶段，影响了最终的聚类精度。
 
-特征学习指的是一类试图利用一组通常稀疏的特征向量来描述一个数据集的学习方法。
-在实践中，有很多不同的算法可以进行特征学习，包括自编码器、高斯混合模型（Gaussian Mixture Model， GMM）和受限玻尔兹曼机。
-这些方法主要学习一个近似局部滤波器字典\ucite{coates2011analysis}，例如用于自然图像的Gabor类边缘滤波器或者用于MNIST数字数据集的书写笔划。
+本章提出了一种新的联合解决共同完成特征学习和聚类的算法，深度嵌入卷积聚类方法（Deep Embedding Convolution Clustering, DECC）。通过利用卷积自编码器进行特征提取，可以充分挖掘数据的局部信息，设计了新的损失函数用于同时更新网络和聚类中心参数。
+% 聚类方法如今已经在各个领域得到了广泛应用
+% 对数据集规模较大的情形，有一些研究只选择数据集的一个子集来加速聚类过程\ucite{shinnou2008spectral}。
+% 为了解决计算复杂度的问题，以往的研究往往首先
+% 这类算法可以分为两个阶段：特征学习和聚类，其主要思想是向目标函数中添加表征稀疏性或者是图形约束的先验知识进行训练学习\ucite{tian2014learning}。
 
-后来，文献\cite{xie2016unsupervised}提出了共同完成特征学习和聚类的算法，深度嵌入聚类算法（Deep Embedding Clustering， DEC）。该算法以自学习的方式定义了一个用于同时更新网络和聚类中心参数的聚类损失函数。
-但是，深度嵌入聚类算法中使用最广泛的神经网络是堆栈自编码器。
-堆栈自编码器需要逐层预训练，然后以端到端（end-to-end）训练的方式进行微调。
-当层次增加时，预训练过程所需时间也急剧增加。此外，堆栈自编码器是建立在全连接的层次上，对处理局部信息是无效的。
+% 特征学习指的是一类试图利用一组通常稀疏的特征向量来描述一个数据集的学习方法。
+% 在实践中，有很多不同的算法可以进行特征学习，包括自编码器、高斯混合模型（Gaussian Mixture Model， GMM）和受限玻尔兹曼机。
+% 这些方法主要学习一个近似局部滤波器字典\ucite{coates2011analysis}，例如用于自然图像的Gabor类边缘滤波器或者用于MNIST数字数据集的书写笔划。
 
 本章安排如下： \ref{sec:cae}节对卷积自编码网络进行了介绍，\ref{sec:decc_method}节构建了本章利用的深度嵌入卷积聚类器，通过利用卷积自编码器对输入地海杂波进行重构，然后利用本章提出的聚类损失函数进行训练，最终获得聚类结果，\ref{sec:decc_experiment}节利用实际数据对本章提出的算法性能进行了分析讨论，\ref{sec:decc_summary}节进行本章总结。
 
@@ -32,11 +30,10 @@
 \end{figure}
 对一组具有$N$个输入向量的给定输入数据集，
 编码器将第$i$个输入信号$x^{(i)}\in\mathbb{R}^{d_x}$编码到某个隐层的表示$h^{(j)}\in\mathbb{R}^{d_h}$，$d_x$和$d_h$分别为输入表示和隐层表示的维数，然后解码器再将$h^{(j)}$解码为输出$x'^{(i)}\in\mathbb{R}^{d_x}$。通过最小化$x^{(i)}$与$x'^{(i)}$之间的差距，可以训练得到一个用来重构输入特征的映射。
-
 编码和解码公式如下：
 \begin{align}
-	h^{(j)}_n &= f(b_n+\sum_{m=1}^{d_x}w_{mn}x^{(i)}_m) \\
-	x'^{(i)}_m &= f(b'_m+\sum_{n=1}^{d_h}w'_{mn}h^{(j)}_n)
+	h^{(j)}_n &= f(b_n+\sum_{m=1}^{d_x}w_{mn}x^{(i)}_m), \\
+	x'^{(i)}_m &= f(b'_m+\sum_{n=1}^{d_h}w'_{mn}h^{(j)}_n),
 \end{align}
 其中，$f$是激活函数函数，${W}=[w_{mn}]$和${W}'=[w'_{mn}]$分别为编码器和解码器的权重矩阵，${b}=[b_n]$和${b'}=[b'_m]$分别为编码器和解码器的偏置向量。
 
@@ -47,7 +44,6 @@
 \subsection{卷积自编码器}
 传统的自编码网络只有一个隐层，只能学习出一种特征变化，于是Bengio\ucite{bengio2007greedy}等人在2007年的仿照stacked RBM构成的DBN，提出堆栈自编码器（Stacked Autoencoders, SAE），为非监督学习在深度网络的应用又增加了一种重要的思路方法。
 堆栈自编码器模型可以参看图\ref{fig:sae}，其通过逐层非监督学习的预训练，也即逐层初始化（Layer-wise Pre-training），来初始化深度网络的参数，替代传统的随机初始化的方法。预训练完毕后，利用训练参数，再进行监督学习训练。
-
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=9cm]{figures/AE/sae}
@@ -75,15 +71,13 @@
 隐层表示$h^k$被用来作为解码器的输入，为了使得解码器的输出和原始的输入数据具有相同的结构，解码器反卷积的超参数由编码器的结构确定，
 因此，解码器的重构过程的计算公式为：
 \begin{equation}
-	x'^k=f(\sum_{k \in H}h^k * \tilde{W}^k + b'^k)
+	x'^k=f(\sum_{k \in H}h^k * \tilde{W}^k + b'^k).
 	\label{equ:cae2}
 \end{equation}
 同样的，每一个输入通道只有一个偏置$b'^k$，$H$表示所有特征图的集合，
 $\tilde{W}$ 表示在两个维度上进行翻转操作后的权重。
 
-
 正如第\ref{sec:network}章介绍，一般的分层网络特别是卷积神经网络，通常引入池化层来获得平移不变性。因此本章的卷积自编码器在编码器阶段添加了池化层，相应的在解码器阶段需要添加上采样来进行处理，如图\ref{fig:unpool}所示。
-
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=13.5cm]{figures/AE/unpool}
@@ -93,22 +87,23 @@ $\tilde{W}$ 表示在两个维度上进行翻转操作后的权重。
 
 模型参数$\Theta=\{{W},{b},{b'}\}$通过最小化其损失函数进行求取，一般利用均方误差损失函数（mean squared error, MSE）：
 \begin{align}
-	\mathscr{L} &= \frac{1}{N}\sum_{i=1}^N||x_i-x_i'||_2^2 \label{equ:mse_loss}\\
-	\theta^* &= arg\min\limits_{\theta} \mathscr{L}  \label{equ:mse}
+	\mathscr{L} &= \frac{1}{N}\sum_{i=1}^N||x_i-x_i'||_2^2, \label{equ:mse_loss}\\
+	\theta^* &= arg\min\limits_{\theta} \mathscr{L}.  \label{equ:mse}
 \end{align}
 就像标准的神经网络一样，反向传播算法被用来计算相对于参数的误差函数的梯度，则可以得到：
 \begin{equation}
-	\frac{\partial \mathscr{L}}{\partial W^k}=x * \Delta h ^k+\tilde{h}^k * \Delta x'
+	\frac{\partial \mathscr{L}}{\partial W^k}=x * \Delta h ^k+\tilde{h}^k * \Delta x',
 \end{equation}
 $\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然后可以使用随机梯度下降（SGD）等基于梯度的优化算法来更新权重。
 
-本节介绍了一种用于分层特征提取的无监督方法，卷积自编码器。相比于传统自编码器，其更有利于学习数据的局部结构，避免特征空间的失真。
+相比于传统自编码器，卷积自编码器更有利于学习数据的局部结构，避免特征空间的失真。
 虽然卷积自编码器的过完备隐层表示使得其学习比标准自编码器更难，但是可以通过添加池化层加强其稀疏性来在一定程度上降低计算量。
 
 \section{深度嵌入卷积聚类方法}
 \label{sec:decc_method}
-深层嵌入聚类算法\ucite{xie2016unsupervised}提供了一种以无监督的方式学习特征表示并聚类的思路，通过联合优化神经网络和聚类中心提高了聚类算法的性能和鲁棒性。但是，该算法由于利用了堆栈自编码器，无法利用数据的局部特征信息，
-因此本章在此基础上利用卷积自编码器代替传统的堆栈自编码器，提出了深度嵌入卷积聚类方法（Deep Embedding Convolution Clustering, DECC）。
+深层嵌入聚类算法\ucite{xie2016unsupervised}提供了一种以无监督的方式同时学习特征表示与聚类的思路，提高了聚类算法的性能和鲁棒性。
+但是，该算法用于特征提取的堆栈自编码器需要逐层预训练，然后以端到端训练的方式进行微调。当层次增加时，预训练过程所需时间会急剧增加。此外，堆栈自编码器是建立在全连接网络上，对处理局部信息是无效的。
+因此本章在此基础上利用卷积自编码器代替传统的堆栈自编码器并设计了新的损失函数，提出了深度嵌入卷积聚类方法（Deep Embedding Convolution Clustering, DECC）。
 
 \subsection{深度嵌入卷积聚类方法结构}
 首先进行问题描述，假设需要将$N$个样本$X=[x_1,\dots,x_N]$聚为$K$个类别，其聚类中心点为$\mu_1,\dots,\mu_K$，其中每一个样本$x_i\in \mathbb{R}^{d_x}$，由于当样本维数增大时会会产生维数灾难的问题，因此需要引入一个嵌入函数$\varphi_W: X \rightarrow Z$，可以将原始样本映射到嵌入子空间$Z=[z_1,\dots,z_N]$，其中$z_i\in \mathbb{R}^{d_z}$的维数远小于原始样本的维数，也即$d_z<<d_x$。
@@ -133,55 +128,54 @@ $\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然
 \subsection{KL散度聚类方法}
 文献\cite{maaten2008visualizing}利用学生t分布来衡量嵌入点$z_i$与聚类中心点$\mu_k$的相似度：
 \begin{equation}
-	p_{ik}=\frac{(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}}{\sum_{k'}(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}}
+p_{ik}=\frac{(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}}{\sum_{k'}(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}},
 	\label{equ:p}
 \end{equation}
 其中，$\alpha$为学生t分布的自由度，$p_{ik}$可以看作样本$i$到类别$k$的概率。
 
 为了定义本章的聚类目标函数，可以使用辅助目标变量（auxiliary target variable）$Q$来迭代地改进模型预测。首先用Kullback-Leibler（KL）散度来减小模型预测$P$和目标分布$Q$之间的距离。
 \begin{equation}
-	\mathscr{L}_{kld}=KL(Q||P)=\frac{1}{N}\sum_{i=1}^{N}\sum_{k=1}^{K}q_{ik}\log{\frac{q_{ik}}{p_{ik}}}
+	\mathscr{L}_{kld}=KL(Q||P)=\frac{1}{N}\sum_{i=1}^{N}\sum_{k=1}^{K}q_{ik}\log{\frac{q_{ik}}{p_{ik}}},
 	\label{equ:kldfirst}
 \end{equation}
 根据文献\cite{xie2016unsupervised}，目标分布$Q$的定义如下：
 \begin{equation}
-	q_{ik}=\frac{p_{ik}^2/f_k}{\sum_k(p_{ik}^2/f_k)}
+	q_{ik}=\frac{p_{ik}^2/f_k}{\sum_k(p_{ik}^2/f_k)},
 	\label{equ:traget_distribution}
 \end{equation}
 其中$f_k$的定义为
 \begin{equation}
-	f_k=\sum_iq_{ik}
+	f_k=\sum_iq_{ik}.
 \end{equation}
 
 \equref{equ:mse}给出了自编码器重构的损失函数，故最终的损失函数为：
 \begin{equation}
-	\mathscr{L}=\mathscr{L}_{mse}+\beta \mathscr{L}_{kld}
+	\mathscr{L}=\mathscr{L}_{mse}+\beta \mathscr{L}_{kld},
 	\label{equ:l_last}
 \end{equation}
-其中，$\beta > 0$为调节两部分损失函数的权重。
+其中，$\beta > 0$为调节两部分损失函数权重的参数。
 
 \subsection{学习算法}
 本章利用随机梯度下降和反向传播对\equref{equ:l_last}中的损失函数进行学习。根据上一节的描述可知，总共有三类参数需要学习：卷积自编码器的权重、聚类中心以及目标分布$Q$。
 \subsubsection{更新卷积自编码器的权重和聚类中心}
 对一个给定的目标分布$Q$，那么聚类损失$\mathscr{L}_{kld}$相对于嵌入点$z_i$和聚类中心点$\mu_k$的梯度计算公式如下：
 \begin{align}
-	\frac{\partial \mathscr{L}_{kld}}{\partial z_i} &= 2\sum_{k=1}^K(1+||z_i-\mu_k||^2)^{-1}(q_{ik}-p_{ik})(z_i-\mu_k) \\
-	\frac{\partial \mathscr{L}_{kld}}{\partial \mu_k} &= 2\sum_{i=1}^N(1+||z_i-\mu_k||^2)^{-1}(p_{ik}-q_{ik})(z_i-\mu_k) \\
+	\frac{\partial \mathscr{L}_{kld}}{\partial z_i} &= 2\sum_{k=1}^K(1+||z_i-\mu_k||^2)^{-1}(q_{ik}-p_{ik})(z_i-\mu_k), \\
+	\frac{\partial \mathscr{L}_{kld}}{\partial \mu_k} &= 2\sum_{i=1}^N(1+||z_i-\mu_k||^2)^{-1}(p_{ik}-q_{ik})(z_i-\mu_k). \\
 \end{align}
-那么对于一个小的批次$m$和学习率$\lambda$，$\mu_k$的更新公式为：
+那么对于一个小的批次$m$和学习率$\lambda$，$\mu_k$的更新为：
 \begin{equation}
-	\mu_k=\mu_k-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{kld}}{\partial \mu_k}}
+	\mu_k=\mu_k-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{kld}}{\partial \mu_k}}.
 \end{equation}
-编码器的权重更新公式为：
+编码器的权重更新为：
 \begin{equation}
-	W=W-\frac{\lambda}{m}\sum_{i=1}^m(\frac{\partial \mathscr{L}_{mse}}{\partial W} + \beta \frac{\partial \mathscr{L}_{kld}}{\partial W})
+	W=W-\frac{\lambda}{m}\sum_{i=1}^m(\frac{\partial \mathscr{L}_{mse}}{\partial W} + \beta \frac{\partial \mathscr{L}_{kld}}{\partial W}).
 	\label{equ:encoder_update}
 \end{equation}
-解码器的权重更新公式为：
+解码器的权重更新为：
 \begin{equation}
-	W'=W'-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{mse}}{\partial W'}}
+	W'=W'-\frac{\lambda}{m}\sum_{i=1}^m{\frac{\partial \mathscr{L}_{mse}}{\partial W'}}.
 \end{equation}
-
 \subsubsection{更新目标分布}
 根据\equref{equ:traget_distribution}可知，目标分布$Q$依赖于先验的软指派（soft assignment）$P$。因此，为了提升结果的鲁棒性，本章利用全部嵌入点每隔$T$次迭代对目标分布进行更新，其更新主要利用\equref{equ:p}和\equref{equ:traget_distribution}。并且每次完成更新后，重新计算样本$x_i$的指派：
 \begin{equation}
@@ -189,7 +183,7 @@ $\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然
 	\label{equ:assign}
 \end{equation}
 当相邻两次更新的指派变化小于一个阈值$\delta$时，停止迭代，那么则可以得到整个算法流程图。
-\\[420pt]
+% \\[420pt]
 \begin{algorithm}[H]
 	\caption{DECC 算法学习过程}
 	\begin{algorithmic}[1] %每行显示行号
@@ -215,8 +209,6 @@ $\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然
 		\EndWhile
 	\end{algorithmic}
 \end{algorithm}
-
-
 \section{仿真验证}
 \label{sec:decc_experiment}
 % \subsection{算法设置}
@@ -245,7 +237,7 @@ $\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然
 		 \midrule
 		DEC & $94.88\%$ & 0.73 & 0.81 \\
 		CAE + K-均值 & $88.68$ & 0.58 & 0.60  \\
-		DECC（$\beta=0$) & $95.63\%$ 0.78 & 0.83 \\
+		DECC（$\beta=0$) & $95.63\%$ & 0.78 & 0.83 \\
 		DECC & $97.85\%$ & 0.86 & 0.92 \\
 		 \bottomrule
 	\end{tabularx}
@@ -271,8 +263,8 @@ $\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然
 
 \section{小结}
 \label{sec:decc_summary}
-本章结合卷积神经网络与自编码器提出了深度嵌入卷积聚类方法，其通过利用卷积自编码器进行提取并在损失函数中将KL散度与重构损失两部分结合，有效提高了聚类精度。
-虽然与有监督学习算法相比，本章的算法精度仍需进一步提高，但是无监督学习的特性使得其避免了繁琐的标定过程。
+本章结合卷积神经网络与自编码器提出了深度嵌入卷积聚类方法，利用卷积自编码器进行特征提取使得数据的局部信息得以保留，并在损失函数中将KL散度与重构损失两部分结合有效提高了聚类精度。
+虽然与有监督学习算法相比，本章的算法精度仍需进一步提高，但是无监督学习的特性克服了大量数据进行标记的成本过高以及部分数据难以人工准确标记的问题。
 % 本章的主要贡献如下：
 % \begin{itemize}
 % 	\item 本章设计了可以以端到端方式训练的卷积自编码器来从未标记的数据中学习特征。通过在地海杂波数据中包含空间、时间信息，通过添加卷积层、卷积转置层和全连接层，设计了好于传统堆栈自编码器的卷积自编码器。

@@ -4,11 +4,12 @@
 \label{sec:network}
 \section{引言}
 
-人工神经网络\ucite{hebb2005organization}是一种通过模仿大脑神经元行为进行信息处理的数学模型，但其无法承受大规模的参数和训练样本并且具有泛化能力差等问题。Fukushima\ucite{fukushima1982neocognitron}于1982年首次提出了卷积神经网络模型，Lecun 等人对神经网络传统算法在训练上面临的计算复杂度高等问题进行了改进，提出了基于梯度下降的优化算法\ucite{lecun1998gradient}和BP算法\ucite{lecun1989backpropagation}。2003年，Simard对卷积神经网络进行了简化\ucite{simard2003best}。Hinton 在2006年的两篇文章\ucite{hinton2006reducing,hinton2006fast}可以作为深度学习（Deep Learning, DL）正式提出的里程碑。Ciren等人\ucite{ciresan2011flexible}在2011年对神经网络进行改造使其可以通过GPU训练计算，并在大量的图像数据集对深度学习算法进行了测试，且都取得了最好的成绩。其在工业界以及学术界掀起了巨大的浪潮，被应用于语音识别\ucite{hinton2012deep}、图像识别\ucite{krizhevsky2012imagenet}和自然语音处理\ucite{collobert2011natural}等各种方面。 专门用于深度学习的芯片不断问世，例如谷歌公司的TPU\ucite{jouppi2017datacenter}，大大提高了深度学习的应用场景。
+人工神经网络\ucite{hebb2005organization}是一种通过模仿大脑神经元行为进行信息处理的数学模型，但其无法承受大规模的参数和训练样本并且具有泛化能力差等问题。Fukushima\ucite{fukushima1982neocognitron}于1982年首次提出了卷积神经网络模型，Lecun 等人对神经网络传统算法在训练上面临的计算复杂度高等问题进行了改进，提出了基于梯度下降的优化算法\ucite{lecun1998gradient} 和BP算法\ucite{lecun1989backpropagation}。2003年，Simard对卷积神经网络进行了简化\ucite{simard2003best}。Hinton 在2006年的两篇文章\ucite{hinton2006reducing,hinton2006fast}可以作为深度学习（Deep Learning, DL）正式提出的里程碑。Ciren等人\ucite{ciresan2011flexible}在2011年对神经网络进行改造使其可以通过GPU训练计算，并在大量的图像数据集对深度学习算法进行了测试，且都取得了最好的成绩。其在工业界以及学术界掀起了巨大的浪潮，被应用于语音识别\ucite{hinton2012deep}、图像识别\ucite{krizhevsky2012imagenet}和自然语音处理\ucite{collobert2011natural}等各种方面。专门用于深度学习的芯片不断问世，例如谷歌公司的TPU\ucite{jouppi2017datacenter}，大大提高了深度学习的应用场景。
 
 深度神经网络模型是一种非常强大的深度学习模型，它同时可以处理有监督和无监督学习任务。并且随着科技的发展，数据量越来越大，计算机并行能力也有了很大的提高。针对海量数据，简单的线性模型由于无法充分利用计算能力，不再适用，可以预见在将来会有越来越多的工作应用到深度学习。目前，其内涵已经超出了传统的多层神经网络，甚至机器学习的范畴，逐渐朝着人工智能的方向快速发展\ucite{silver2017mastering}。
 
 本章安排如下：\ref{sec:network_classification}节对深度学习的基本分类进行了介绍，\ref{sec:neural}节详细地阐述了传统人工神经网络结构的定义和神经元之间信息传递的过程，\ref{sec:cnn}节对本文主要运用的深度卷积神经网络的特性进行了介绍，\ref{sec:network_summary}节进行本章总结。
+
 \section{基本分类}
 \label{sec:network_classification}
 传统上可以把深度学习分为卷积神经网络、递归神经网络（Recurrent Neural Networks， RNN）、长短时记忆网络（Long short-term memory, LSTM）、深度信念网络（Deep Belief NetWorks, DBN）、自编码器、稀疏编码（Sparse Coding）、受限玻尔兹曼机（Restricted Boltzmann Machine, RBM）等。
@@ -24,10 +25,10 @@
 \section{传统人工神经网络结构}
 \label{sec:neural}
 人工神经网络是一种模拟大脑神经系统的算法，其可以从海量的训练样本中学习到一个权重函数，用来进行模式识别、分类等。神经网络主要是将许多个单一神经元（也称作感知器）连接在一起，一个神经元的输出就可以是另一个神经元的输入，形成一个有向无环的网络结构。
-首先介绍单一神经元的结构，如图\ref{fig:neural}所示，神经元一般具有多个输入$x=[x_1,x_2,\dots，x_n] $，这些输入可以取0和1中的任意值。神经元对每一个输入有权重$w=[w_1,w_2,\dots,w_n] $ 和一个总的偏置$b_0$ ，其输出为:
+首先介绍单一神经元的结构，如图\ref{fig:neural}所示，神经元一般具有多个输入$x=[x_1,x_2,\dots,x_n] $，这些输入可以取0和1中的任意值。神经元对每一个输入有权重$w=[w_1,w_2,\dots,w_n] $ 和一个总的偏置$b_0$ ，其输出为:
 \begin{equation}
-  y = f(w\cdot x + b)
-  \label{equ:neural}
+y = f(w\cdot x + b_0),
+\label{equ:neural}
 \end{equation}
 其中， $f$为该神经元的激活函数。
 
@@ -40,51 +41,51 @@
 
 上述多个神经元分层互联即可形成神经网络，图\ref{fig:network}是一个简单的神经网络，其中圆圈表示神经网络的节点，也即神经元。
 对于一个具有$n_l$层的神经网络，如将第$ l $层用 $ L_l$表示，则有最左边的一层$  L_1$为输入层，最右的一层$ L_{n_l} $为输出层。由于不能在训练样本集中观测到中间所有节点的值，故将这些层称做隐层。
-本例中网络的层数$ n_l=3$，输入层具有4个输入单元，隐层具有5个隐层单元，输出层只有一个输出单元。
+本例中网络的层数$n_l=3$，输入层具有4个输入单元，隐层具有5个隐层单元，输出层只有一个输出单元。
 
 \begin{figure}[hbt]
-  \centering
-  \sWuhao
-  \includestandalone{figures/networks/network1}
-  \caption{神经网络}
-  \label{fig:network}
+\centering
+\sWuhao
+\includestandalone{figures/networks/network1}
+\caption{神经网络}
+\label{fig:network}
 \end{figure}
 
 根据输入 $x_i$求解输出$y$的主要过程为前向传播。
-用$ w^{(l)}_{ij}$表示第 $ l $层的第 $ j$ 单元与第 $ l+1 $层的第$  i$ 单元之间的权重，$ b^{(l)}_i $是第$  l+1 $层中第$  i$ 单元的偏置项。
-因此，$w^{(l)}$为第$l$层权重组成的向量，$ w^{(1)} \in \Re^{4\times 3}$ ， $ w^{(2)} \in \Re^{1\times 5}$ 。
+用$ w^{(l)}_{ij}$表示第 $ l $层的第 $ j$ 单元与第 $l+1 $层的第$i$ 单元之间的权重，$ b^{(l)}_i $是第$l$层中第$i$ 单元的偏置项。
+因此，$w^{(l)}$为第$l$层权重组成的向量，$ w^{(1)} \in \mathbb{R}^{4\times 3}$ ， $ w^{(2)} \in \mathbb{R}^{1\times 5}$ 。
 根据图\ref{fig:neural}和\equref{equ:neural}可以知道每个神经元节点的输出是经过激活函数的激活值，可以用$ y^{(l)}_i$ 表示第$  l $层的第 $ i$ 单元的输出值。
 当$  l=1$ 时，$  y^{(1)}_i$为就是第$  i $个输入值，也即有$  y^{(1)}_i = x_i $。
 当权重已知时，可以根据\equref{equ:neural}求解此传播过程，进而求解最终的输出值$y$。
 从$L_1$层到$L_2$层的过程为：
 \begin{align}
-  y_1^{(2)} &= f(w_{11}^{(1)}x_1 + w_{12}^{(1)} x_2 + w_{13}^{(1)} x_3 + w_{14}^{(1)} x_4 + b_1^{(1)})  \\
-  y_2^{(2)} &= f(w_{21}^{(1)}x_1 + w_{22}^{(1)} x_2 + w_{23}^{(1)} x_3 + w_{24}^{(1)} x_4 + b_2^{(1)})  \\
-  y_3^{(2)} &= f(w_{31}^{(1)}x_1 + w_{32}^{(1)} x_2 + w_{33}^{(1)} x_3 + w_{34}^{(1)} x_4 + b_3^{(1)})  
+  y_1^{(2)} &= f(w_{11}^{(1)}x_1 + w_{12}^{(1)} x_2 + w_{13}^{(1)} x_3 + w_{14}^{(1)} x_4 + b_1^{(1)}),  \\
+  y_2^{(2)} &= f(w_{21}^{(1)}x_1 + w_{22}^{(1)} x_2 + w_{23}^{(1)} x_3 + w_{24}^{(1)} x_4 + b_2^{(1)}),  \\
+  y_3^{(2)} &= f(w_{31}^{(1)}x_1 + w_{32}^{(1)} x_2 + w_{33}^{(1)} x_3 + w_{34}^{(1)} x_4 + b_3^{(1)}),
 \end{align}
 \begin{align}
-  y_4^{(2)} &= f(w_{41}^{(1)}x_1 + w_{42}^{(1)} x_2 + w_{43}^{(1)} x_3 + w_{44}^{(1)} x_4 + b_4^{(1)})  \\
-  y_5^{(2)} &= f(w_{51}^{(1)}x_1 + w_{52}^{(1)} x_2 + w_{53}^{(1)} x_3 + w_{54}^{(1)} x_4 + b_5^{(1)})
+  y_4^{(2)} &= f(w_{41}^{(1)}x_1 + w_{42}^{(1)} x_2 + w_{43}^{(1)} x_3 + w_{44}^{(1)} x_4 + b_4^{(1)}),  \\
+  y_5^{(2)} &= f(w_{51}^{(1)}x_1 + w_{52}^{(1)} x_2 + w_{53}^{(1)} x_3 + w_{54}^{(1)} x_4 + b_5^{(1)}).
   \label{equ:fp1}
 \end{align}
 根据同样的计算过程可以得到：
 \begin{equation}
-  y = y_1^{(3)} =  f(w_{11}^{(2)} y_1^{(2)} + w_{12}^{(2)} y_2^{(2)} + w_{13}^{(2)} y_3^{(2)} + w_{14}^{(2)} y_4^{(2)} + w_{15}^{(2)} y_5^{(2)} + b_1^{(2)})
+  y = y_1^{(3)} =  f(w_{11}^{(2)} y_1^{(2)} + w_{12}^{(2)} y_2^{(2)} + w_{13}^{(2)} y_3^{(2)} + w_{14}^{(2)} y_4^{(2)} + w_{15}^{(2)} y_5^{(2)} + b_1^{(2)}).
   \label{equ:fp2}
 \end{equation}
 把\equref{equ:fp1}代入\equref{equ:fp2}就可以计算得到输入$x_i$与输出$y$之间的关系。
 为了使表达更清晰，用$ z^{(l)}_i $表示第$ l $层第$  i$单元输入加权和，则有：
 \begin{equation}
-  z_i^{(l)} = \sum_{j=1}^n w^{(l-1)}_{ij} x_j + b^{(l)}_i
+  z_i^{(l)} = \sum_{j=1}^n w^{(l-1)}_{ij} x_j + b^{(l)}_i.
 \end{equation}
 因此\equref{equ:fp1}变为：
 \begin{equation}
-  y^{(l)}_i = f(z^{(l)}_i)
+  y^{(l)}_i = f(z^{(l)}_i).
 \end{equation}
 则整个前向传播过程可以简化为：
 \begin{align}
   z^{(l+1)} &= w^{(l)} y^{(l)} + b^{(l)}   \\
-  h^{(l+1)} &= f(z^{(l+1)})
+  h^{(l+1)} &= f(z^{(l+1)}),
 \end{align}
 其中，$b^{(l)}$为第$l+1$层偏置项组成的向量，$h^{(l)}$为第$l$层各个单元输出值组成的向量。
 
@@ -106,7 +107,7 @@
 卷积神经网络是深度学习中的一种重要算法，在分类等很多领域具有很大的优势，该方法经常被用于图像识别、语音识别等问题。
 卷积神经网络是一种特殊的人工神经网络，由多对卷积层（Convolutional layer）和池化层（Pooling layer），以及全连接层（Full-connected layer）组成。图\ref{fig:cnn_network}为一个典型的卷积神经网络，最左边的为输入层，其中的神经元为输入神经元。最右边的输出层包含有一个或者多个输出神经元，其余的是多组卷积、池化层和有限数量的完全连接的隐层。
 
-网络的前向传播主要是卷积和池化操作，其网络参数的更新采用误差反向传播（Error Backpropagation）算法。相比于传统人工网络，卷积神经网络有以下几个特点：
+网络的前向传播主要是卷积和池化操作，其网络参数的更新采用误差反向传播（Error Backpropagation）算法。相比于传统人工网络，卷积神经网络有以下特点：
 \begin{itemize}
   \item 输入为原始数据，对原始数据进行卷积运算，然后提取从最后一步生成的卷积数据的特征，丰富了识别中使用的特征。
   \item 多个卷积核可以利用输入数据中的局部结构，将整个输入空间划分成很小的隐层单元。将各个隐层单元的权重构建得到的卷积核作用于整个输入空间，从而得到特征向量。这种机制不仅大大减少了参数数量同时提高了数据的平移不变性。
@@ -140,29 +141,29 @@
 根据输入高度$ T $和宽度$ N $，可以计算输出图像的高度和宽度：
 \begin{align}
   N_p&=\frac{N+2P-R_C}{S_C}+1 \;,&
-  T_p&=\frac{T+2P-R_C}{S_C}+1\;
+  T_p&=\frac{T+2P-R_C}{S_C}+1.
 \end{align}
-通常对输入数据进行边界扩充（padding）来使得输入特征图的宽度和高度满足$ N = N_p = T = T_p $，这样当前进步长$ S_C = 1 $时，可以得到：
+通常对输入数据进行边界扩充（padding）来使得输入特征图的宽度和高度满足$ N = N_p = T = T_p $，这样当前进步长$ S_C = 1 $ 时，可以得到：
 \begin{align}
-P&=\frac{R_C-1}{2}\;
+P&=\frac{R_C-1}{2}.
 \end{align}
 一个给定的层$ L_n $的卷积运算的计算过程为：
 \begin{align}
 y_{f\,l\,m}^{(\nu)}&=\sum^{F_\nu-1}_{f'=0}\sum^{R_C-1}_{j=0}\sum^{R_C-1}_{k=0}
-w^{(o)f}_{f'\,j\,k}h^{(\nu)}_{f'\,S_Cl+j\,S_Cm+k}\;
+w^{(o)f}_{f'\,j\,k}h^{(\nu)}_{f'\,S_Cl+j\,S_Cm+k},
 \end{align}
 其中$ o $表示网络中的第$ o + 1 $个卷积核。
 $\nu \in [0,N-1 ]$ 表示网络中的第 $\nu$个隐层，$f\in[0,F_{\nu+1}-1]$为输入卷积层的第$f$个特征图， $l\in[0,N_{\nu+1}-1 ]$为输入卷积层的第$v$个特征图的宽度单位， $m\in[0,T_{\nu+1}-1 ]$为输入卷积层的第$v$个特征图的高度单位。 因此可以得到 $S_Cl+j\in[0,N_\nu-1 ]$， $S_Cl+m\in[0,T_\nu-1 ]$。于是可以通过添加激活函数计算隐层单元的输出。
 考虑到边界填充可以得到：
 \begin{align}
-h_{f\,l+P\,m+P}^{(\nu+1)}&=f\left(y_{f\,l\,m}^{(\nu)}\right)\;
+h_{f\,l+P\,m+P}^{(\nu+1)}&=f\left(y_{f\,l\,m}^{(\nu)}\right).
 \end{align}
-每个滤波器只关心数据的部分特征，当出现它学习到的特征的时候，就会呈现激活态。
+每个滤波器只关心数据的部分特征，当出现它学习到的特征时，就会呈现激活态。
 
 \subsection{共享权重和偏置}
 如前节所述，每个隐层神经元具有一个偏置和连接到它的局部感受野的权重，对该层的每一个神经元使用相同的权重和偏置，那么第$j$个隐层神经元的输出为：
 \begin{equation}
-  h_j = f(b+\sum_{m=1}^M w_m y_{j+m})
+  h_j = f(b+\sum_{m=1}^M w_m y_{j+m}),
   \label{equ:shared_weight}
 \end{equation}
 其中，$f$是神经元的激活函数，$b$是偏置的共享值，$w_m$是一个共享权重的$1\times M$向量，$y_k$表示位置$k$的输入激活值。
@@ -176,20 +177,20 @@ h_{f\,l+P\,m+P}^{(\nu+1)}&=f\left(y_{f\,l\,m}^{(\nu)}\right)\;
 
 给定的第$\nu$个平均池化操作的公式为：
 \begin{align}
-  y_{f,l,m}^{(\nu)}&=\sum^{R_P-1}_{j,k=0} h_{f,S_Pl+j+P,S_Pm+k+P}^{(\nu)}\;
+  y_{f,l,m}^{(\nu)}&=\sum^{R_P-1}_{j,k=0} h_{f,S_Pl+j+P,S_Pm+k+P}^{(\nu)}.
   \label{equ:pool}
 \end{align}
 最大池化的公式为：
 \begin{align}
-  y_{f,l,m}^{(\nu)}&=\max^{R_P-1}_{j,k=0} h_{f,S_Pl+j+P,S_Pm+k+P}^{(\nu)}\;
+  y_{f,l,m}^{(\nu)}&=\max_{j,k \in \{0, \ldots, R_P-1\}} h_{f,S_Pl+j+P,S_Pm+k+P}^{(\nu)},
   \label{equ:maxpool}
 \end{align}
 其中，$\nu \in [0,N-1 ]$ 表示网络中的第 $\nu$个隐层，$f\in[0,F_{\nu+1}-1]$, $l\in[0,N_{\nu+1}-1 ]$ 以及 $m\in[0,T_{\nu+1}-1 ]$。因此有 $S_Pl+j\in[0,N_\nu-1 ]$， $S_Pl+m\in[0,T_\nu-1 ]$。
 最大池化是最常用的一种池化方式，本文所用的神经网络结构均使用最大池化。
-用$j^{(t)(p)}_{_{f，l，m}},\,k^{(t)(p)}_{_{f，l，m}}$来表示第$t$次批采样在 $l,m$处特征向量图的最大值，则\equref{equ:maxpool}变为：
+用$j^{(t)(p)}_{_{f,l,m}},\,k^{(t)(p)}_{_{f,l,m}}$来表示第$t$次批采样在 $l,m$处特征向量图的最大值，则\equref{equ:maxpool} 变为：
 \begin{align}
 h_{f,l+P,m+P}^{(t)(\nu+1)}&=y_{f,l,m}^{(t)(\nu)}=
-h^{(t)(\nu)}_{f,S_P l+j^{(t)(p)}_{_{f，l，m}}+P,S_Pm+k^{(t)(p)}_{_{f，l，m}}+P}\;
+h^{(t)(\nu)}_{f,S_P l+j^{(t)(p)}_{_{f,l,m}}+P,S_Pm+k^{(t)(p)}_{_{f,l,m}}+P}.
 \end{align}
 
 \begin{figure}[hbt]
@@ -211,11 +212,11 @@ h^{(t)(\nu)}_{f,S_P l+j^{(t)(p)}_{_{f，l，m}}+P,S_Pm+k^{(t)(p)}_{_{f，l，m}}
 在传统人工神经网络中常用的激活函数为sigmoid激活函数（S型激活函数），其取值范围为$(0,1)$，其定义为：
 
 \begin{align}
-f(x)&=\sigma(x)=\frac{1}{1+e^{-x}}\;
+f(x)&=\sigma(x)=\frac{1}{1+e^{-x}}.
 \end{align}
 对其求导可以得到：
 \begin{align}
-\sigma'(x)&=\sigma(x)\left(1-\sigma(x)\right)\;
+\sigma'(x)&=\sigma(x)\left(1-\sigma(x)\right).
 \end{align}
 
 \begin{figure}[hbt]
@@ -229,11 +230,11 @@ f(x)&=\sigma(x)=\frac{1}{1+e^{-x}}\;
 
 tanh 激活函数的取值范围为 $(-1,1)$，其定义如下：
 \begin{align}
-f(x)&=\tanh(x)=\frac{1-e^{-2x}}{1+e^{-2x}}\;
+f(x)&=\tanh(x)=\frac{1-e^{-2x}}{1+e^{-2x}}.
 \end{align}
 对其求导可以得到：
 \begin{align}
-\tanh'(x)&=1-\tanh^2(x)\;
+\tanh'(x)&=1-\tanh^2(x).
 \end{align}
 
 
@@ -244,14 +245,14 @@ ReLU(Rectified Linear Unit)的取值范围为$[0,+\infty)$，其定义为：
 f(x)&={\rm ReLU}(x)=\begin{cases}
       x & x\geq 0 \\
       0& x<0
-   \end{cases}\;
+   \end{cases}.
 \end{align}
 对其求导可以得到：
 \begin{align}
 {\rm ReLU}'(x)&=\begin{cases}
       1 & x\geq 0 \\
       0 & x<0
-   \end{cases}\;
+   \end{cases}.
 \end{align}
 
 
@@ -276,26 +277,26 @@ f(x)&={\rm ReLU}(x)=\begin{cases}
 ReLU具有优于传统激活函数的几个优点：更快的计算速度和更有效的梯度传播（它们不像S形单元那样饱和），生物学可能性和稀疏激活结构。尽管它结构简单，但仍然保持足够的辨别性质。其缺点之一是随机权重的初始状态，多个单元可能过早地落入死区（零输出的恒定梯度）。因此，当与整个连接层进行全连接时，Sigmod激活函数的效果更好。
 
 \subsection{神经网络的学习算法}
-参照上文的符号定义，用符号$x $表示训练输入的向量集，$w$表示所有的网络中权重的集合，$b$ 是所有的偏置，用$y=f(w\cdot x + b)$ 表示对应的期望输出。学习算法的主要目的是找到一个权重$w$和偏置$b$使得网络的输出$y$ 可以拟合所有的训练输入$x$。为此可以定义一个损失函数或代价函数(loss function)$C(w,b)$，不同的问题可以选取不同的损失函数。
+参照上文的符号定义，用符号$x $表示训练输入的向量集，$w$表示所有的网络中权重的集合，$b$ 是所有的偏置，用$y=f(w\cdot x + b)$ 表示对应的期望输出。学习算法的主要目的是找到一个权重$w$和偏置$b$使得网络的输出$y$ 可以拟合所有的训练输入$x$。为此可以定义一个损失函数或代价函数(loss function)$C(w,b)$，不同问题可以选取不同损失函数。
 
 从定义可以看出，$C(w,b) $越小说明分类越准确，那么训练神经网络的目的就是找到使得损失函数 $C(w,b)$最小的权重和偏置。
 为了求解该问题，将上述问题一般化，原问题变为最小化任意的具有 $m $个变量的多元实值函数 $C(v) $， $v=v_1,v_2,\dots,v_m $。这种具有大量变量的函数的解析解的求解是极其复杂的，一个比较合理的思路为利用数值计算的方法求取其极值点。每次给$C $中的自变量$v$添加一个微小的变化$\Delta v $，根据此变化反映出来的$C $的变化$\Delta C $更新下次的微小变化，从而使得$C $ 可以持续减小。对$C $中自变量的变化$\Delta v=(\Delta v_1,\dots,\Delta v_m)^T $ ， $\Delta C $将会变为
 \begin{equation}
-    \Delta C \approx \nabla C \cdot \Delta v
+\Delta C \approx \nabla C \cdot \Delta v,
     \label{equ:gradient1}
 \end{equation}
-，此处梯度$\nabla C $ 的定义如下：
+此处梯度$\nabla C $ 的定义如下：
 \begin{equation}
-\nabla C \equiv (\frac{\partial C}{\partial v_1},\dots,\frac{\partial C}{\partial v_m})^T
+\nabla C \equiv (\frac{\partial C}{\partial v_1},\dots,\frac{\partial C}{\partial v_m})^T,
 \end{equation}
 其把$v$的变化关联为$C$的变化，假设选取$\Delta v=-\eta \nabla C $，其中的$\eta $是学习率，一般取一个很小的正数，则\equref{equ:gradient1}变为：
 \begin{equation}
-\Delta C \approx -\eta\nabla C\cdot\nabla C=-\eta||\nabla C||^2 \leq 0
+\Delta C \approx -\eta\nabla C\cdot\nabla C=-\eta||\nabla C||^2 \leq 0.
 \end{equation}
-也即如果利用更新规则$v \rightarrow v'=v-\eta \nabla C$，$C$会持续减小，此更新规则即为最基础的学习算法，梯度下降算法。
-图\ref{fig:gradient-descent}展示了梯度下降的示意图，其跟随当前位置最陡的下降的方向也即负梯度，其中学习率$ \eta $描述在每个迭代步骤中下降的步长。
-可以根据选择不同的损失函数 $C $或者通过计算来完成学习率的选择等各种技术对学习算法进行优化。
-根据梯度下降的思想，结合卷积神经网络中的反向传播，获得神经卷积神经网路的训练流程图，如图\ref{fig:cnn_train}所示。
+也即如利用更新规则$v \rightarrow v'=v-\eta \nabla C$，$C$会持续减小，此更新规则即为最基础的梯度下降算法。
+图\ref{fig:gradient-descent}为梯度下降示意图，其跟随当前位置最陡的下降方向也即负梯度，其中学习率$\eta $描述在每个迭代步骤中下降的步长。
+可根据选择不同损失函数$C$或通过计算来完成学习率选择等各种技术对学习算法进行优化。
+根据梯度下降思想，结合卷积神经网络中的反向传播，获得神经卷积神经网路的训练流程图，如图\ref{fig:cnn_train}所示。
 
 
 \begin{figure}[hbt]
