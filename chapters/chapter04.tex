@@ -42,8 +42,9 @@
 以及可以基于连续的数据流在运行中添加或合并隐层单元的在线增量自编码器\ucite{zhou2012online}。
 
 \subsection{卷积自编码器}
-传统的自编码网络只有一个隐层，只能学习出一种特征变化，于是Bengio\ucite{bengio2007greedy}等人在2007年的仿照stacked RBM构成的DBN，提出堆栈自编码器（Stacked Autoencoders, SAE），为非监督学习在深度网络的应用又增加了一种重要的思路方法。
-堆栈自编码器模型可以参看图\ref{fig:sae}，其通过逐层非监督学习的预训练，也即逐层初始化（Layer-wise Pre-training），来初始化深度网络的参数，替代传统的随机初始化的方法。预训练完毕后，利用训练参数，再进行监督学习训练。
+传统的自编码网络只有一个隐层，只能学习出一种特征变化，但是图\ref{fig:sae}所示的堆栈自编码器（Stacked Autoencoders, SAE）在一定程度上解决了这个问题。
+% 于是Bengio\ucite{bengio2007greedy}等人在2007年的仿照stacked RBM构成的DBN，提出堆栈自编码器（Stacked Autoencoders, SAE），为非监督学习在深度网络的应用又增加了一种重要的思路方法。%--查重去掉
+% 堆栈自编码器模型可以参看图\ref{fig:sae}，其通过逐层非监督学习的预训练，也即逐层初始化（Layer-wise Pre-training），来初始化深度网络的参数，替代传统的随机初始化的方法。预训练完毕后，利用训练参数，再进行监督学习训练。%--查重去掉
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=9cm]{figures/AE/sae}
