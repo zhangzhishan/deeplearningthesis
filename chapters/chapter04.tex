@@ -110,7 +110,7 @@ $\Delta h$ 和 $\Delta x'$分别是隐层状态和重构结果的变化量，然
 然后，利用K-均值聚类算法，将子空间$Z$进行聚类，得到初始聚类中心${\mu_k}$。
 
 本章利用卷积自编码器作为嵌入函数对原始样本进行降维，其结构如图 \ref{fig:cae} 所示。
-通过三次卷积操作充分提取输入样本的特征，同时在所有层添加ReLU激活函数，并且在编码器后以相反的顺序放置反卷积解码器。在编码器与解码器中间添加嵌入层（图\ref{fig:cae}中绿色标记的全连接层），该层的结果被用于进行聚类操作。DECC的结构如图 \ref{fig:decc} 所示。
+通过三次卷积操作充分提取输入样本的特征，同时在所有层添加ReLU激活函数，并且在编码器后以相反的顺序放置反卷积解码器。在编码器与解码器中间添加嵌入层（图\ref{fig:cae}中黄色标记的全连接层），该层的结果被用于进行聚类操作。DECC的结构如图 \ref{fig:decc} 所示。
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=13.5cm]{figures/AE/cae}
@@ -145,7 +145,7 @@ p_{ik}=\frac{(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}}{\sum_{k'}(1+||z_i
 \end{equation}
 其中$f_k$的定义为
 \begin{equation}
-	f_k=\sum_iq_{ik}.
+	f_k=\sum_iq_{ik}
 \end{equation}
 
 \equref{equ:mse}给出了自编码器重构的损失函数，故最终的损失函数为：
@@ -212,13 +212,14 @@ p_{ik}=\frac{(1+||z_i-\mu_k||^2/\alpha)^{-\frac{\alpha+1}{2}}}{\sum_{k'}(1+||z_i
 \section{仿真验证}
 \label{sec:decc_experiment}
 % \subsection{算法设置}
-本章利用第\ref{sec:othr}章中组C的训练数据用于本章的实验，考虑到地海杂波在时间与空间上的连续性，本章选取了相邻3帧，相邻9个单元供27个单元的杂波信号将其进行组合，并进行随机重排复制得到一个$128\times 128$的二维数据，其示意图参看图 \ref{fig:unsurpvised_data}。
+本章利用第\ref{sec:othr}章中组C的训练数据用于本章的实验，考虑到地海杂波在时间与空间上的连续性，本章选取了相邻3帧，相邻9个单元共27个单元的杂波信号将其进行组合，并进行随机重排复制得到一个$128\times 128$的二维数据，其示意图参看图 \ref{fig:unsurpvised_data}。
 \begin{figure}[hbt]
 	\centering
 	\includegraphics[width=6.67cm]{figures/AE/unsurpvised_data}
 	\caption{输入样本示意图}
 	\label{fig:unsurpvised_data}
 \end{figure}
+
 本章根据图\ref{fig:cae}设计的卷积自编码器进行特征的降维，该部分进行30次迭代，学习方法为Adam，嵌入层为10维，也即利用10维的特征向量对原始输入信号进行表示。
 然后根据此特征向量，随机进行20次K-均值算法，然后从中选取最优结果作为起始的聚类中心点，此也作为本章的一个对比算法。损失函数的权重系数$\beta = 0.1$，学生t分布的自由度$\alpha = 1$。
 最终的优化问题通过小批量随机梯度下降和反向传播得到有效解决，其中批长度为256，学习率为0.01。

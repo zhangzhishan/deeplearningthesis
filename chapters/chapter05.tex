@@ -16,7 +16,7 @@
 
 \section{引言}
 辐射源识别算法需要在无法收集大量数据的前提下正确的对目标进行分类并准确区分出已知目标和未知目标。
-与传统利用已知类别的样本进行训练测试的机器学习算法不同，本站的问题是在Open Set的背景下，需要考虑输入未知分类样本的情况。
+与传统利用已知类别的样本进行训练测试的机器学习算法不同，本章的问题是在Open Set的背景下，需要考虑输入未知分类样本的情况。
 由于在复杂电磁环境下传统的辐射源个体识别面临识别能力差和无法识别未知目标等问题与挑战，因此需要寻找一种新的方法解决该问题。
 
 本章综合雷达信号处理、深度学习等多学科理论，通过对实际数据的分析，结合深度卷积神经网络与支持向量机方法，以雷达信号的模糊函数切片作为训练样本的特征向量，构建了一个可以对未知分类进行辨识的分类器。最后，利用数据进行验证，证明本章提出的分类器具有很高的准确性。
@@ -359,7 +359,7 @@ x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}},
 	\end{tabular}
 \end{table}
 
-同对迭代次数与识别准确率和损失函数进行了验证，其结果如图 \ref{fig:openset_epoch}、图\ref{fig:diff_loss}和表\ref{tab:cnn_epoch_29}所示，无论是训练样本还是测试样本，其精度与损失函数均很快收敛到比较好的水平，不过相应的学习时间也正比增长，故在实际工程中需要对精度和时间进行衡量选取一个最合适的迭代次数。
+同对迭代次数与识别准确率和损失函数进行了验证，在CPU为i5-3.30GHz、运存为1GB的Linux虚拟机运行本章的算法程序，其结果如图 \ref{fig:openset_epoch}、图\ref{fig:diff_loss}和表\ref{tab:cnn_epoch_29}所示，无论是训练样本还是测试样本，其精度与损失函数均很快收敛到比较好的水平，不过相应的学习时间也正比增长，故在实际工程中需要对精度和时间进行衡量选取一个最合适的迭代次数。
 \begin{table}[hbt]
 	\renewcommand{\arraystretch}{1.3}
 	\caption{深度卷积神经网络分类结果}
@@ -407,12 +407,12 @@ x^{*}=\frac{x-x_{min}}{x_{max}-x_{min}},
 
 \begin{table}[hbt]
 	\renewcommand{\arraystretch}{1.3}
-	\caption{不同已知类别个数数据识别结果}
+	\caption{不同已知实验类别个数数据识别结果}
 	\label{tab:nb_classes}
 	\centering\sWuhao
 	\begin{tabularx}{\textwidth}{>{\centering\arraybackslash}X>{\centering\arraybackslash}X>{\centering\arraybackslash}X}
 		\toprule
-		 已知类别数目 & 已知类别识别正确率 & 未知类别分辨正确率 \\
+		 已知实验类别数目 & 已知类别识别正确率 & 未知类别分辨正确率 \\
 		\midrule
 		2 & 99.55\% & 84.32\% \\
 		3 & 99.59\% & 93.10\% \\
